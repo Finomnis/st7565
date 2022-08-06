@@ -3,7 +3,7 @@
 
 mod command;
 
-//#[cfg(test)]
+#[cfg(test)]
 mod tests;
 
 /// ST7565 driver.
