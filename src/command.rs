@@ -51,6 +51,7 @@ where
         let data = match command {
             DisplayOnOff { on } => Single(0b10101110 | on as u8),
             DisplayStartLineSet { address } => Single(0b01000000 | (address & 0b00111111)),
+            PageAddressSet { address } => Single(0b10110000 | (address & 0b00001111)),
             _ => Single(0),
         };
 

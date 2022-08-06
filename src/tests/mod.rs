@@ -38,12 +38,36 @@ mod unit_tests {
         check_command(DisplayOnOff { on: false }, &[0b10101110]);
         check_command(DisplayStartLineSet { address: 0b101010 }, &[0b01101010]);
         check_command(DisplayStartLineSet { address: 0b010101 }, &[0b01010101]);
+        check_command(
+            DisplayStartLineSet {
+                address: 0b11000000,
+            },
+            &[0b01000000],
+        );
         check_command(PageAddressSet { address: 0b1010 }, &[0b10111010]);
         check_command(PageAddressSet { address: 0b0101 }, &[0b10110101]);
+        check_command(
+            PageAddressSet {
+                address: 0b11110000,
+            },
+            &[0b10110000],
+        );
         check_command(ColumnAddressSetUpper { address: 0b1010 }, &[0b00011010]);
         check_command(ColumnAddressSetUpper { address: 0b0101 }, &[0b00010101]);
+        check_command(
+            ColumnAddressSetUpper {
+                address: 0b11110000,
+            },
+            &[0b00010000],
+        );
         check_command(ColumnAddresSetLower { address: 0b1010 }, &[0b00001010]);
         check_command(ColumnAddresSetLower { address: 0b0101 }, &[0b00000101]);
+        check_command(
+            ColumnAddresSetLower {
+                address: 0b11110000,
+            },
+            &[0b00000000],
+        );
         check_command(AdcSelect { reverse: true }, &[0b10100001]);
         check_command(AdcSelect { reverse: false }, &[0b10100000]);
         check_command(DisplayNormalReverse { reverse: true }, &[0b10100111]);
@@ -78,6 +102,12 @@ mod unit_tests {
             &[0b00101010],
         );
         check_command(
+            PowerControlSet {
+                operating_mode: 0b11111000,
+            },
+            &[0b00101000],
+        );
+        check_command(
             V0VoltageRegulatorInternalResistorSet {
                 resistor_ratio: 0b101,
             },
@@ -90,6 +120,12 @@ mod unit_tests {
             &[0b00100010],
         );
         check_command(
+            V0VoltageRegulatorInternalResistorSet {
+                resistor_ratio: 0b11111000,
+            },
+            &[0b00100000],
+        );
+        check_command(
             ElectronicVolumeSet {
                 volume_value: 0b101010,
             },
@@ -100,6 +136,12 @@ mod unit_tests {
                 volume_value: 0b010101,
             },
             &[0b10000001, 0b00010101],
+        );
+        check_command(
+            ElectronicVolumeSet {
+                volume_value: 0b11000000,
+            },
+            &[0b10000001, 0b00000000],
         );
         check_command(
             StaticIndicatorSet {
