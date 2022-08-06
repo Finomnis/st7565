@@ -4,7 +4,11 @@ name = "st7565"
 edition = "2018"
 version = "0.1.0"
 
+[lib]
+harness = false
+
 [dependencies]
+display-interface = "0.4"
 
 [dev-dependencies]
 cortex-m = "0.7.3"
