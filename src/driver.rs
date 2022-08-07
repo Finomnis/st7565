@@ -12,6 +12,7 @@ pub struct ST7565<DI> {
     pub(crate) lcd_bias_mode: bool,
     pub(crate) power_control_mode: PowerControlMode,
     pub(crate) voltage_regulator_resistor_ratio: u8,
+    pub(crate) electric_volume_value: u8,
 }
 
 impl<DI> ST7565<DI>
@@ -52,6 +53,11 @@ where
             .map_err(Error::Comm)?;
 
         // electric volume
+        self.interface
+            .send_command(Command::ElectronicVolumeSet {
+                volume_value: self.electric_volume_value,
+            })
+            .map_err(Error::Comm)?;
 
         // power control
         self.interface

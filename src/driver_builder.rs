@@ -7,6 +7,7 @@ pub struct ST7565DriverBuilder<DI> {
     lcd_bias_mode: bool,
     power_control_mode: PowerControlMode,
     voltage_regulator_resistor_ratio_value: u8,
+    electric_volume_value: u8,
 }
 
 impl<DI> ST7565DriverBuilder<DI>
@@ -23,6 +24,7 @@ where
                 voltage_follower_circuit: false,
             },
             voltage_regulator_resistor_ratio_value: 0,
+            electric_volume_value: 0,
         }
     }
 
@@ -41,12 +43,18 @@ where
         self
     }
 
+    pub fn electric_volume(mut self, value: u8) -> Self {
+        self.electric_volume_value = value;
+        self
+    }
+
     pub fn build(self) -> ST7565<DI> {
         ST7565 {
             interface: self.interface,
             lcd_bias_mode: self.lcd_bias_mode,
             power_control_mode: self.power_control_mode,
             voltage_regulator_resistor_ratio: self.voltage_regulator_resistor_ratio_value,
+            electric_volume_value: self.electric_volume_value,
         }
     }
 }
