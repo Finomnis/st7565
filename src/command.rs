@@ -4,9 +4,9 @@ use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 
 #[derive(Debug, Copy, Clone)]
 pub enum BoosterRatio {
-    StepUp_2x_3x_4x,
-    StepUp_5x,
-    StepUp_6x,
+    StepUp2x3x4x,
+    StepUp5x,
+    StepUp6x,
 }
 
 /// Commands
@@ -73,9 +73,9 @@ where
             BoosterRatioSet { stepup_value } => Double(
                 0b11111000,
                 match stepup_value {
-                    BoosterRatio::StepUp_2x_3x_4x => 0b00000000,
-                    BoosterRatio::StepUp_5x => 0b00000001,
-                    BoosterRatio::StepUp_6x => 0b00000011,
+                    BoosterRatio::StepUp2x3x4x => 0b00000000,
+                    BoosterRatio::StepUp5x => 0b00000001,
+                    BoosterRatio::StepUp6x => 0b00000011,
                 },
             ),
             NOP => Single(0b11100011),

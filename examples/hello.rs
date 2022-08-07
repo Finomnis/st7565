@@ -2,8 +2,13 @@
 #![no_std]
 
 use defmt_rtt as _; // global logger
-use nrf52840_hal as _; // memory layout
+use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
+
+use display_interface_spi::SPIInterface;
+use embedded_hal::blocking::spi::Write;
+use hal::gpio::Level;
+use st7565::ST7565;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -21,6 +26,40 @@ pub fn exit() -> ! {
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
+    let peripherals = hal::pac::Peripherals::take().unwrap();
+    let port0 = hal::gpio::p0::Parts::new(peripherals.P0);
+    let port1 = hal::gpio::p1::Parts::new(peripherals.P1);
+
+    // Get DOGM132W-5 pins
+    let mut disp_rst = port0.p0_12.into_push_pull_output(Level::High);
+    let disp_cs = port1.p1_09.into_push_pull_output(Level::High).degrade();
+    let disp_a0 = port0.p0_23.into_push_pull_output(Level::Low).degrade();
+    let disp_scl = port0.p0_21.into_push_pull_output(Level::Low).degrade();
+    let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
+
+    let mut timer = hal::timer::Timer::new(peripherals.TIMER0);
+
+    let disp_spi = SPIInterface::new(
+        hal::Spim::new(
+            peripherals.SPIM0,
+            hal::spim::Pins {
+                sck: disp_scl,
+                mosi: Some(disp_si),
+                miso: None,
+            },
+            hal::spim::Frequency::M16,
+            hal::spim::MODE_3,
+            0,
+        ),
+        disp_a0,
+        disp_cs,
+    );
+
+    let mut disp = ST7565::new(disp_spi, 10);
+    disp.reset(&mut disp_rst, &mut timer).unwrap();
+
     defmt::println!("Hello, world!");
+
+    loop {}
     exit()
 }
