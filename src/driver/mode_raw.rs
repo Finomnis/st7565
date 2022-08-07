@@ -1,10 +1,11 @@
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 
-use super::ModeRaw;
 use crate::command::{Command, SendSt7565Command};
 use crate::ST7565;
 
-impl<DI: WriteOnlyDataCommand> ST7565<DI, ModeRaw> {
+pub struct RawMode;
+
+impl<DI: WriteOnlyDataCommand> ST7565<DI, RawMode> {
     pub fn set_page(&mut self, page: u8) -> Result<(), DisplayError> {
         self.interface
             .send_command(Command::PageAddressSet { address: page })

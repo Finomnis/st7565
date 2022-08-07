@@ -3,10 +3,10 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    DisplaySpecs, Error, StaticIndicatorMode,
+    Error, StaticIndicatorMode,
 };
 
-use super::{ModeInit, ST7565};
+use super::ST7565;
 
 impl<DI: WriteOnlyDataCommand, MODE> ST7565<DI, MODE> {
     /// Set the static indicator
