@@ -72,27 +72,12 @@ fn main() -> ! {
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = ST7565::new(disp_spi, display_specs).into_raw_mode();
+    let mut disp = ST7565::new(disp_spi, display_specs).into_graphics_mode::<132, 4>();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
 
-    disp.set_page(2).unwrap();
-    disp.set_column(10).unwrap();
-    let mut data = [0u8; 100];
-    for (pos, val) in (&mut data).iter_mut().enumerate() {
-        *val = pos as u8;
-    }
-    disp.write_pixel_data(&data).unwrap();
-
-    defmt::println!("Hello, world!");
-
-    let mut scroll = 0;
     loop {
-        //disp.set_inverted(scroll % 2 == 0).unwrap();
-        scroll = (scroll + 1) % 32;
-        timer.delay_ms(200u8);
-        timer.delay_ms(200u8);
         timer.delay_ms(100u8);
     }
 }

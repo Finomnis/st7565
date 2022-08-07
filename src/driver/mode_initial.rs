@@ -27,9 +27,9 @@ impl<DI: WriteOnlyDataCommand> ST7565<DI, InitialMode> {
         self.into_mode(RawMode)
     }
 
-    pub fn into_graphics_mode<const WIDTH: u8, const HEIGHT: u8>(
+    pub fn into_graphics_mode<const WIDTH: usize, const PAGES: usize>(
         self,
-    ) -> ST7565<DI, GraphicsMode<WIDTH, HEIGHT>> {
+    ) -> ST7565<DI, GraphicsMode<WIDTH, PAGES>> {
         self.into_mode(GraphicsMode::new())
     }
 }
