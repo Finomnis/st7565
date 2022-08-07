@@ -8,7 +8,7 @@ use panic_probe as _;
 use display_interface_spi::SPIInterface;
 use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
-use st7565::{st7565_driver, BoosterRatio, DisplaySpecs, PowerControlMode};
+use st7565::{BoosterRatio, DisplaySpecs, PowerControlMode, ST7565};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -72,7 +72,7 @@ fn main() -> ! {
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = st7565_driver(disp_spi, display_specs).into_raw_mode();
+    let mut disp = ST7565::new(disp_spi, display_specs).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();

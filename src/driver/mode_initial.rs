@@ -1,11 +1,20 @@
 use display_interface::WriteOnlyDataCommand;
 
 use super::{mode_graphics::GraphicsMode, mode_raw::RawMode};
-use crate::ST7565;
+use crate::{DisplaySpecs, ST7565};
 
 pub struct InitialMode;
 
 impl<DI: WriteOnlyDataCommand> ST7565<DI, InitialMode> {
+    /// Creates an ST7565 driver.
+    pub fn new(interface: DI, display_specs: DisplaySpecs) -> Self {
+        Self {
+            interface,
+            display_specs,
+            mode: InitialMode,
+        }
+    }
+
     fn into_mode<MODE>(self, mode: MODE) -> ST7565<DI, MODE> {
         ST7565 {
             interface: self.interface,
