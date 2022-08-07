@@ -8,7 +8,7 @@ use panic_probe as _;
 use display_interface_spi::SPIInterface;
 use embedded_hal::blocking::spi::Write;
 use hal::gpio::Level;
-use st7565::ST7565;
+use st7565::ST7565DriverBuilder;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -30,6 +30,9 @@ fn main() -> ! {
     let port0 = hal::gpio::p0::Parts::new(peripherals.P0);
     let port1 = hal::gpio::p1::Parts::new(peripherals.P1);
 
+    // Create timer
+    let mut timer = hal::timer::Timer::new(peripherals.TIMER0);
+
     // Get DOGM132W-5 pins
     let mut disp_rst = port0.p0_12.into_push_pull_output(Level::High);
     let disp_cs = port1.p1_09.into_push_pull_output(Level::High).degrade();
@@ -37,8 +40,7 @@ fn main() -> ! {
     let disp_scl = port0.p0_21.into_push_pull_output(Level::Low).degrade();
     let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
 
-    let mut timer = hal::timer::Timer::new(peripherals.TIMER0);
-
+    // Create DOGM132W-5 spi bus
     let disp_spi = SPIInterface::new(
         hal::Spim::new(
             peripherals.SPIM0,
@@ -55,7 +57,8 @@ fn main() -> ! {
         disp_cs,
     );
 
-    let mut disp = ST7565::new(disp_spi, 10);
+    // Build DOGM132W-5 display driver
+    let mut disp = ST7565DriverBuilder::new(disp_spi).build();
     disp.reset(&mut disp_rst, &mut timer).unwrap();
 
     defmt::println!("Hello, world!");
