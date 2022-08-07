@@ -3,13 +3,14 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    Error,
+    Error, PowerControlMode,
 };
 
 /// ST7565 driver.
 pub struct ST7565<DI> {
     pub(crate) interface: DI,
     pub(crate) lcd_bias_mode: bool,
+    pub(crate) power_control_mode: PowerControlMode,
 }
 
 impl<DI> ST7565<DI>
@@ -43,15 +44,17 @@ where
         // Common output mode selection - TODO
 
         // v0 regulator resistor ratio
-        self.interface
-            .send_command(Command::V0VoltageRegulatorInternalResistorSet { resistor_ratio: 0 })
-            .map_err(Error::Comm)?;
+        // self.interface
+        //     .send_command(Command::V0VoltageRegulatorInternalResistorSet { resistor_ratio: 0 })
+        //     .map_err(Error::Comm)?;
         // electric volume
 
         // power control
-        // self.interface
-        //     .send_command(Command::PowerControlSet { mode: 0 })
-        //     .map_err(Error::Comm)?;
+        self.interface
+            .send_command(Command::PowerControlSet {
+                mode: self.power_control_mode,
+            })
+            .map_err(Error::Comm)?;
 
         // initialize dram
 

@@ -1,10 +1,11 @@
 use display_interface::WriteOnlyDataCommand;
 
-use crate::ST7565;
+use crate::{PowerControlMode, ST7565};
 
 pub struct ST7565DriverBuilder<DI> {
     interface: DI,
     lcd_bias_mode: bool,
+    power_control_mode: PowerControlMode,
 }
 
 impl<DI> ST7565DriverBuilder<DI>
@@ -15,6 +16,11 @@ where
         Self {
             interface,
             lcd_bias_mode: false,
+            power_control_mode: PowerControlMode {
+                booster_circuit: false,
+                voltage_regulator_circuit: false,
+                voltage_follower_circuit: false,
+            },
         }
     }
 
@@ -23,10 +29,16 @@ where
         self
     }
 
+    pub fn power_control(mut self, mode: PowerControlMode) -> Self {
+        self.power_control_mode = mode;
+        self
+    }
+
     pub fn build(self) -> ST7565<DI> {
         ST7565 {
             interface: self.interface,
             lcd_bias_mode: self.lcd_bias_mode,
+            power_control_mode: self.power_control_mode,
         }
     }
 }
