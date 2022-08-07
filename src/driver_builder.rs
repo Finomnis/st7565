@@ -1,6 +1,6 @@
 use display_interface::WriteOnlyDataCommand;
 
-use crate::{PowerControlMode, ST7565};
+use crate::{BoosterRatio, PowerControlMode, ST7565};
 
 pub struct ST7565DriverBuilder<DI> {
     interface: DI,
@@ -8,6 +8,7 @@ pub struct ST7565DriverBuilder<DI> {
     power_control_mode: PowerControlMode,
     voltage_regulator_resistor_ratio_value: u8,
     electric_volume_value: u8,
+    booster_ratio_value: BoosterRatio,
 }
 
 impl<DI> ST7565DriverBuilder<DI>
@@ -25,6 +26,7 @@ where
             },
             voltage_regulator_resistor_ratio_value: 0,
             electric_volume_value: 0,
+            booster_ratio_value: BoosterRatio::StepUp2x3x4x,
         }
     }
 
@@ -48,13 +50,19 @@ where
         self
     }
 
+    pub fn booster_ratio(mut self, value: BoosterRatio) -> Self {
+        self.booster_ratio_value = value;
+        self
+    }
+
     pub fn build(self) -> ST7565<DI> {
         ST7565 {
             interface: self.interface,
             lcd_bias_mode: self.lcd_bias_mode,
             power_control_mode: self.power_control_mode,
             voltage_regulator_resistor_ratio: self.voltage_regulator_resistor_ratio_value,
-            electric_volume_value: self.electric_volume_value,
+            electric_volume: self.electric_volume_value,
+            booster_ratio: self.booster_ratio_value,
         }
     }
 }

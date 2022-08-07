@@ -3,7 +3,7 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    Error, PowerControlMode,
+    BoosterRatio, Error, PowerControlMode,
 };
 
 /// ST7565 driver.
@@ -12,7 +12,8 @@ pub struct ST7565<DI> {
     pub(crate) lcd_bias_mode: bool,
     pub(crate) power_control_mode: PowerControlMode,
     pub(crate) voltage_regulator_resistor_ratio: u8,
-    pub(crate) electric_volume_value: u8,
+    pub(crate) electric_volume: u8,
+    pub(crate) booster_ratio: BoosterRatio,
 }
 
 impl<DI> ST7565<DI>
@@ -44,6 +45,13 @@ where
 
         // ADC Selection - TODO
         // Common output mode selection - TODO
+
+        // Booster ratio
+        self.interface
+            .send_command(Command::BoosterRatioSet {
+                stepup_value: self.booster_ratio,
+            })
+            .map_err(Error::Comm)?;
 
         // v0 regulator resistor ratio
         self.interface
