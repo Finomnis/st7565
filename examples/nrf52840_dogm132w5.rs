@@ -8,7 +8,7 @@ use panic_probe as _;
 use display_interface_spi::SPIInterface;
 use embedded_hal::blocking::spi::Write;
 use hal::gpio::Level;
-use st7565::ST7565DriverBuilder;
+use st7565::{PowerControlMode, ST7565DriverBuilder, StaticIndicatorMode};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -69,7 +69,9 @@ fn main() -> ! {
         .electric_volume(0b011111)
         .build();
     disp.reset(&mut disp_rst, &mut timer).unwrap();
-    disp.set_static_indicator(0b10).unwrap();
+    disp.set_static_indicator(Some(StaticIndicatorMode::BlinkFast))
+        .unwrap();
+    disp.set_display_on(true).unwrap();
 
     defmt::println!("Hello, world!");
 

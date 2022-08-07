@@ -1,9 +1,9 @@
-use display_interface::WriteOnlyDataCommand;
+use display_interface::{DisplayError, WriteOnlyDataCommand};
 use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    BoosterRatio, Error, PowerControlMode,
+    BoosterRatio, Error, PowerControlMode, StaticIndicatorMode,
 };
 
 /// ST7565 driver.
@@ -21,7 +21,18 @@ where
     DI: WriteOnlyDataCommand,
 {
     /// Set the static indicator
-    // /pub fn set_static_indicator(
+    pub fn set_static_indicator(
+        &mut self,
+        mode: Option<StaticIndicatorMode>,
+    ) -> Result<(), DisplayError> {
+        self.interface
+            .send_command(Command::StaticIndicatorSet { mode })
+    }
+
+    /// Enable/Disable the display output
+    pub fn set_display_on(&mut self, on: bool) -> Result<(), DisplayError> {
+        self.interface.send_command(Command::DisplayOnOff { on })
+    }
 
     /// Reset the display.
     pub fn reset<RST, DELAY, PinE>(
