@@ -74,5 +74,4 @@ fn main() -> ! {
     defmt::println!("Hello, world!");
 
     loop {}
-    exit()
 }
