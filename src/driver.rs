@@ -3,23 +3,26 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    BoosterRatio, Error, PowerControlMode, StaticIndicatorMode,
+    BoosterRatio, DisplaySpecs, Error, PowerControlMode, StaticIndicatorMode,
 };
 
 /// ST7565 driver.
 pub struct ST7565<DI> {
-    pub(crate) interface: DI,
-    pub(crate) lcd_bias_mode: bool,
-    pub(crate) power_control_mode: PowerControlMode,
-    pub(crate) voltage_regulator_resistor_ratio: u8,
-    pub(crate) electric_volume: u8,
-    pub(crate) booster_ratio: BoosterRatio,
+    interface: DI,
+    display_specs: DisplaySpecs,
 }
 
 impl<DI> ST7565<DI>
 where
     DI: WriteOnlyDataCommand,
 {
+    pub fn new(interface: DI, display_specs: DisplaySpecs) -> Self {
+        Self {
+            interface,
+            display_specs,
+        }
+    }
+
     /// Set the static indicator
     pub fn set_static_indicator(
         &mut self,
@@ -34,7 +37,7 @@ where
         self.interface.send_command(Command::DisplayOnOff { on })
     }
 
-    /// Reset the display.
+    /// Reset the display and restore all settings
     pub fn reset<RST, DELAY, PinE>(
         &mut self,
         rst: &mut RST,
@@ -55,42 +58,58 @@ where
         // LCD Bias
         self.interface
             .send_command(Command::LcdBiasSet {
-                bias_1_7: self.lcd_bias_mode,
+                bias_mode_1: self.display_specs.bias_mode_1,
             })
             .map_err(Error::Comm)?;
 
-        // ADC Selection - TODO
-        // Common output mode selection - TODO
+        // ADC Selection
+        self.interface
+            .send_command(Command::AdcSelect {
+                reverse: self.display_specs.flip_columns,
+            })
+            .map_err(Error::Comm)?;
+
+        // Common output mode selection
+        self.interface
+            .send_command(Command::CommonOutputModeSelect {
+                reverse_direction: self.display_specs.flip_rows,
+            })
+            .map_err(Error::Comm)?;
+
+        // Display invertion
+        self.interface
+            .send_command(Command::DisplayNormalReverse {
+                reverse: self.display_specs.inverted,
+            })
+            .map_err(Error::Comm)?;
 
         // Booster ratio
         self.interface
             .send_command(Command::BoosterRatioSet {
-                stepup_value: self.booster_ratio,
+                stepup_value: self.display_specs.booster_ratio,
             })
             .map_err(Error::Comm)?;
 
-        // v0 regulator resistor ratio
+        // voltage regulator resistor ratio
         self.interface
             .send_command(Command::VoltageRegulatorInternalResistorSet {
-                resistor_ratio: self.voltage_regulator_resistor_ratio,
+                resistor_ratio: self.display_specs.voltage_regulator_resistor_ratio,
             })
             .map_err(Error::Comm)?;
 
         // electric volume
         self.interface
             .send_command(Command::ElectronicVolumeSet {
-                volume_value: self.electric_volume,
+                volume_value: self.display_specs.electronic_volume,
             })
             .map_err(Error::Comm)?;
 
         // power control
         self.interface
             .send_command(Command::PowerControlSet {
-                mode: self.power_control_mode,
+                mode: self.display_specs.power_control,
             })
             .map_err(Error::Comm)?;
-
-        // initialize dram - TODO
 
         Ok(())
     }

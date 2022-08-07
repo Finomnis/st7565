@@ -34,7 +34,7 @@ pub enum Command {
     AdcSelect { reverse: bool },
     DisplayNormalReverse { reverse: bool },
     DisplayAllPoints { on: bool },
-    LcdBiasSet { bias_1_7: bool },
+    LcdBiasSet { bias_mode_1: bool },
     Reset,
     CommonOutputModeSelect { reverse_direction: bool },
     PowerControlSet { mode: PowerControlMode },
@@ -73,7 +73,7 @@ where
             AdcSelect { reverse } => Single(0b10100000 | reverse as u8),
             DisplayNormalReverse { reverse } => Single(0b10100110 | reverse as u8),
             DisplayAllPoints { on } => Single(0b10100100 | on as u8),
-            LcdBiasSet { bias_1_7 } => Single(0b10100010 | bias_1_7 as u8),
+            LcdBiasSet { bias_mode_1 } => Single(0b10100010 | bias_mode_1 as u8),
             Reset => Single(0b11100010),
             CommonOutputModeSelect { reverse_direction } => {
                 Single(0b11000000 | ((reverse_direction as u8) << 3))

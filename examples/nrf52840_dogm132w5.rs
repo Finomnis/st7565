@@ -7,7 +7,7 @@ use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
 use hal::gpio::Level;
-use st7565::{PowerControlMode, ST7565DriverBuilder};
+use st7565::{BoosterRatio, DisplaySpecs, PowerControlMode, ST7565};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -57,16 +57,22 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let mut disp = ST7565DriverBuilder::new(disp_spi)
-        .lcd_bias(false)
-        .power_control(PowerControlMode {
+    let display_specs = DisplaySpecs {
+        power_control: PowerControlMode {
             booster_circuit: true,
             voltage_regulator_circuit: true,
             voltage_follower_circuit: true,
-        })
-        .voltage_regulator_resistor_ratio(0b011)
-        .electric_volume(0b011111)
-        .build();
+        },
+        voltage_regulator_resistor_ratio: 0b011,
+        electronic_volume: 0b011111,
+        flip_rows: false,
+        flip_columns: false,
+        inverted: false,
+        bias_mode_1: false,
+        booster_ratio: BoosterRatio::StepUp2x3x4x,
+    };
+    let mut disp = ST7565::new(disp_spi, display_specs);
+
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
 
