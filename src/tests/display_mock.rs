@@ -13,12 +13,12 @@ impl DisplayMock {
             data: None,
         }
     }
-    pub fn expect_data(data: &[u8]) -> DisplayMockExpectation<'_> {
-        DisplayMockExpectation {
-            cmd: None,
-            data: Some(data),
-        }
-    }
+    // pub fn expect_data(data: &[u8]) -> DisplayMockExpectation<'_> {
+    //     DisplayMockExpectation {
+    //         cmd: None,
+    //         data: Some(data),
+    //     }
+    // }
 }
 
 impl WriteOnlyDataCommand for DisplayMockExpectation<'_> {

@@ -9,6 +9,13 @@ pub enum BoosterRatio {
     StepUp6x,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct PowerControlMode {
+    pub booster_circuit: bool,
+    pub voltage_regulator_circuit: bool,
+    pub voltage_follower_circuit: bool,
+}
+
 /// Commands
 #[derive(Debug, Copy, Clone)]
 pub enum Command {
@@ -23,7 +30,7 @@ pub enum Command {
     LcdBiasSet { bias_1_7: bool },
     Reset,
     CommonOutputModeSelect { reverse_direction: bool },
-    PowerControlSet { operating_mode: u8 },
+    PowerControlSet { mode: PowerControlMode },
     V0VoltageRegulatorInternalResistorSet { resistor_ratio: u8 },
     ElectronicVolumeSet { volume_value: u8 },
     StaticIndicatorSet { on: bool, flash: bool },
@@ -62,9 +69,12 @@ where
             CommonOutputModeSelect { reverse_direction } => {
                 Single(0b11000000 | ((reverse_direction as u8) << 3))
             }
-            PowerControlSet { operating_mode } => {
-                Single(0b00101000 | (operating_mode & 0b00000111))
-            }
+            PowerControlSet { mode } => Single(
+                0b00101000
+                    | ((mode.booster_circuit as u8) << 2)
+                    | ((mode.voltage_regulator_circuit as u8) << 1)
+                    | (mode.voltage_follower_circuit as u8),
+            ),
             V0VoltageRegulatorInternalResistorSet { resistor_ratio } => {
                 Single(0b00100000 | (resistor_ratio & 0b00000111))
             }

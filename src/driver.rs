@@ -21,7 +21,7 @@ where
         &mut self,
         rst: &mut RST,
         delay: &mut DELAY,
-    ) -> Result<(), Error<(), PinE>>
+    ) -> Result<(), Error<PinE>>
     where
         RST: OutputPin<Error = PinE>,
         DELAY: DelayMs<u8>,
@@ -33,17 +33,25 @@ where
         // Initialize
 
         // LCD Bias
-        self.interface.send_command(Command::LcdBiasSet {
-            bias_1_7: self.lcd_bias_mode,
-        })?;
+        self.interface
+            .send_command(Command::LcdBiasSet {
+                bias_1_7: self.lcd_bias_mode,
+            })
+            .map_err(Error::Comm)?;
 
-        // ADC Selection
-        // Common output mode selection
+        // ADC Selection - TODO
+        // Common output mode selection - TODO
 
         // v0 regulator resistor ratio
+        self.interface
+            .send_command(Command::V0VoltageRegulatorInternalResistorSet { resistor_ratio: 0 })
+            .map_err(Error::Comm)?;
         // electric volume
 
         // power control
+        // self.interface
+        //     .send_command(Command::PowerControlSet { mode: 0 })
+        //     .map_err(Error::Comm)?;
 
         // initialize dram
 

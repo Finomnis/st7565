@@ -17,8 +17,6 @@ fn panic() -> ! {
 // one `#[tests]` module in this library crate
 #[defmt_test::tests]
 mod unit_tests {
-    use defmt::assert;
-
     use super::display_mock::DisplayMock;
 
     #[test]
@@ -26,7 +24,7 @@ mod unit_tests {
         use crate::command::{
             BoosterRatio,
             Command::{self, *},
-            SendSt7565Command,
+            PowerControlMode, SendSt7565Command,
         };
         fn check_command(cmd: Command, result: &[u8]) {
             DisplayMock::expect_command(result)
@@ -101,21 +99,33 @@ mod unit_tests {
         );
         check_command(
             PowerControlSet {
-                operating_mode: 0b101,
+                mode: PowerControlMode {
+                    booster_circuit: true,
+                    voltage_regulator_circuit: false,
+                    voltage_follower_circuit: false,
+                },
             },
-            &[0b00101101],
+            &[0b00101100],
         );
         check_command(
             PowerControlSet {
-                operating_mode: 0b010,
+                mode: PowerControlMode {
+                    booster_circuit: false,
+                    voltage_regulator_circuit: true,
+                    voltage_follower_circuit: false,
+                },
             },
             &[0b00101010],
         );
         check_command(
             PowerControlSet {
-                operating_mode: 0b11111000,
+                mode: PowerControlMode {
+                    booster_circuit: false,
+                    voltage_regulator_circuit: false,
+                    voltage_follower_circuit: true,
+                },
             },
-            &[0b00101000],
+            &[0b00101001],
         );
         check_command(
             V0VoltageRegulatorInternalResistorSet {
@@ -176,19 +186,19 @@ mod unit_tests {
         );
         check_command(
             BoosterRatioSet {
-                stepup_value: BoosterRatio::StepUp_2x_3x_4x,
+                stepup_value: BoosterRatio::StepUp2x3x4x,
             },
             &[0b11111000, 0b00000000],
         );
         check_command(
             BoosterRatioSet {
-                stepup_value: BoosterRatio::StepUp_5x,
+                stepup_value: BoosterRatio::StepUp5x,
             },
             &[0b11111000, 0b00000001],
         );
         check_command(
             BoosterRatioSet {
-                stepup_value: BoosterRatio::StepUp_6x,
+                stepup_value: BoosterRatio::StepUp6x,
             },
             &[0b11111000, 0b00000011],
         );

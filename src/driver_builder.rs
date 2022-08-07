@@ -1,5 +1,4 @@
 use display_interface::WriteOnlyDataCommand;
-use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::ST7565;
 
