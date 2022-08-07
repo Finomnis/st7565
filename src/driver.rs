@@ -11,6 +11,7 @@ pub struct ST7565<DI> {
     pub(crate) interface: DI,
     pub(crate) lcd_bias_mode: bool,
     pub(crate) power_control_mode: PowerControlMode,
+    pub(crate) voltage_regulator_resistor_ratio: u8,
 }
 
 impl<DI> ST7565<DI>
@@ -44,9 +45,12 @@ where
         // Common output mode selection - TODO
 
         // v0 regulator resistor ratio
-        // self.interface
-        //     .send_command(Command::V0VoltageRegulatorInternalResistorSet { resistor_ratio: 0 })
-        //     .map_err(Error::Comm)?;
+        self.interface
+            .send_command(Command::VoltageRegulatorInternalResistorSet {
+                resistor_ratio: self.voltage_regulator_resistor_ratio,
+            })
+            .map_err(Error::Comm)?;
+
         // electric volume
 
         // power control

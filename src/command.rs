@@ -31,7 +31,7 @@ pub enum Command {
     Reset,
     CommonOutputModeSelect { reverse_direction: bool },
     PowerControlSet { mode: PowerControlMode },
-    V0VoltageRegulatorInternalResistorSet { resistor_ratio: u8 },
+    VoltageRegulatorInternalResistorSet { resistor_ratio: u8 },
     ElectronicVolumeSet { volume_value: u8 },
     StaticIndicatorSet { on: bool, flash: bool },
     BoosterRatioSet { stepup_value: BoosterRatio },
@@ -75,7 +75,7 @@ where
                     | ((mode.voltage_regulator_circuit as u8) << 1)
                     | (mode.voltage_follower_circuit as u8),
             ),
-            V0VoltageRegulatorInternalResistorSet { resistor_ratio } => {
+            VoltageRegulatorInternalResistorSet { resistor_ratio } => {
                 Single(0b00100000 | (resistor_ratio & 0b00000111))
             }
             ElectronicVolumeSet { volume_value } => Double(0b10000001, volume_value & 0b00111111),

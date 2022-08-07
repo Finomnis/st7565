@@ -128,19 +128,19 @@ mod unit_tests {
             &[0b00101001],
         );
         check_command(
-            V0VoltageRegulatorInternalResistorSet {
+            VoltageRegulatorInternalResistorSet {
                 resistor_ratio: 0b101,
             },
             &[0b00100101],
         );
         check_command(
-            V0VoltageRegulatorInternalResistorSet {
+            VoltageRegulatorInternalResistorSet {
                 resistor_ratio: 0b010,
             },
             &[0b00100010],
         );
         check_command(
-            V0VoltageRegulatorInternalResistorSet {
+            VoltageRegulatorInternalResistorSet {
                 resistor_ratio: 0b11111000,
             },
             &[0b00100000],
