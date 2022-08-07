@@ -53,30 +53,28 @@ mod unit_tests {
             &[0b10110000],
         );
         check_command(
-            ColumnAddressSetUpper {
+            ColumnAddressSet {
                 address: 0b10100000,
             },
-            &[0b00011010],
+            &[0b00011010, 0b00000000],
         );
         check_command(
-            ColumnAddressSetUpper {
+            ColumnAddressSet {
                 address: 0b01010000,
             },
-            &[0b00010101],
+            &[0b00010101, 0b00000000],
         );
         check_command(
-            ColumnAddressSetUpper {
-                address: 0b00001111,
+            ColumnAddressSet {
+                address: 0b00001010,
             },
-            &[0b00010000],
+            &[0b00010000, 0b00001010],
         );
-        check_command(ColumnAddressSetLower { address: 0b1010 }, &[0b00001010]);
-        check_command(ColumnAddressSetLower { address: 0b0101 }, &[0b00000101]);
         check_command(
-            ColumnAddressSetLower {
-                address: 0b11110000,
+            ColumnAddressSet {
+                address: 0b00000101,
             },
-            &[0b00000000],
+            &[0b00010000, 0b00000101],
         );
         check_command(AdcSelect { reverse: true }, &[0b10100001]);
         check_command(AdcSelect { reverse: false }, &[0b10100000]);

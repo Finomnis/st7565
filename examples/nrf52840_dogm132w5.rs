@@ -6,9 +6,8 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
-use embedded_hal::blocking::spi::Write;
 use hal::gpio::Level;
-use st7565::{PowerControlMode, ST7565DriverBuilder, StaticIndicatorMode};
+use st7565::{PowerControlMode, ST7565DriverBuilder};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -74,5 +73,4 @@ fn main() -> ! {
     defmt::println!("Hello, world!");
 
     loop {}
-    exit()
 }
