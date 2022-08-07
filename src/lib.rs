@@ -11,6 +11,7 @@ mod error;
 
 pub use command::BoosterRatio;
 pub use command::PowerControlMode;
+pub use command::StaticIndicatorMode;
 pub use driver::ST7565;
 pub use driver_builder::ST7565DriverBuilder;
 pub use error::Error;

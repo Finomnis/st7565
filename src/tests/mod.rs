@@ -21,10 +21,12 @@ mod unit_tests {
 
     #[test]
     fn commands() {
-        use crate::command::{
-            BoosterRatio,
-            Command::{self, *},
-            PowerControlMode, SendSt7565Command,
+        use crate::{
+            command::{
+                Command::{self, *},
+                SendSt7565Command,
+            },
+            BoosterRatio, PowerControlMode, StaticIndicatorMode,
         };
         fn check_command(cmd: Command, result: &[u8]) {
             DisplayMock::expect_command(result)
@@ -165,25 +167,29 @@ mod unit_tests {
         );
         check_command(
             StaticIndicatorSet {
-                on: true,
-                flash: false,
+                mode: Some(StaticIndicatorMode::Off),
             },
             &[0b10101101, 0b00000000],
         );
         check_command(
             StaticIndicatorSet {
-                on: false,
-                flash: true,
+                mode: Some(StaticIndicatorMode::On),
             },
-            &[0b10101100, 0b00000001],
+            &[0b10101101, 0b00000011],
         );
         check_command(
             StaticIndicatorSet {
-                on: false,
-                flash: false,
+                mode: Some(StaticIndicatorMode::BlinkSlow),
             },
-            &[0b10101100, 0b00000000],
+            &[0b10101101, 0b00000001],
         );
+        check_command(
+            StaticIndicatorSet {
+                mode: Some(StaticIndicatorMode::BlinkFast),
+            },
+            &[0b10101101, 0b00000010],
+        );
+        check_command(StaticIndicatorSet { mode: None }, &[0b10101100]);
         check_command(
             BoosterRatioSet {
                 stepup_value: BoosterRatio::StepUp2x3x4x,

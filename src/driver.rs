@@ -20,6 +20,9 @@ impl<DI> ST7565<DI>
 where
     DI: WriteOnlyDataCommand,
 {
+    /// Set the static indicator
+    // /pub fn set_static_indicator(
+
     /// Reset the display.
     pub fn reset<RST, DELAY, PinE>(
         &mut self,
@@ -30,11 +33,12 @@ where
         RST: OutputPin<Error = PinE>,
         DELAY: DelayMs<u8>,
     {
+        // Reset display
         rst.set_low().map_err(Error::Pin)?;
         delay.delay_ms(1);
         rst.set_high().map_err(Error::Pin)?;
 
-        // Initialize
+        // Initialize display
 
         // LCD Bias
         self.interface
@@ -63,7 +67,7 @@ where
         // electric volume
         self.interface
             .send_command(Command::ElectronicVolumeSet {
-                volume_value: self.electric_volume_value,
+                volume_value: self.electric_volume,
             })
             .map_err(Error::Comm)?;
 
@@ -74,7 +78,7 @@ where
             })
             .map_err(Error::Comm)?;
 
-        // initialize dram
+        // initialize dram - TODO
 
         Ok(())
     }

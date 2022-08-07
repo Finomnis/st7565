@@ -16,6 +16,14 @@ pub struct PowerControlMode {
     pub voltage_follower_circuit: bool,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum StaticIndicatorMode {
+    Off,
+    BlinkSlow,
+    BlinkFast,
+    On,
+}
+
 /// Commands
 #[derive(Debug, Copy, Clone)]
 pub enum Command {
@@ -33,7 +41,7 @@ pub enum Command {
     PowerControlSet { mode: PowerControlMode },
     VoltageRegulatorInternalResistorSet { resistor_ratio: u8 },
     ElectronicVolumeSet { volume_value: u8 },
-    StaticIndicatorSet { on: bool, flash: bool },
+    StaticIndicatorSet { mode: Option<StaticIndicatorMode> },
     BoosterRatioSet { stepup_value: BoosterRatio },
     NOP,
 }
@@ -79,7 +87,16 @@ where
                 Single(0b00100000 | (resistor_ratio & 0b00000111))
             }
             ElectronicVolumeSet { volume_value } => Double(0b10000001, volume_value & 0b00111111),
-            StaticIndicatorSet { on, flash } => Double(0b10101100 | on as u8, flash as u8),
+            StaticIndicatorSet { mode: None } => Single(0b10101100),
+            StaticIndicatorSet { mode: Some(mode) } => Double(
+                0b10101101,
+                match mode {
+                    StaticIndicatorMode::Off => 0b00,
+                    StaticIndicatorMode::BlinkSlow => 0b01,
+                    StaticIndicatorMode::BlinkFast => 0b10,
+                    StaticIndicatorMode::On => 0b11,
+                },
+            ),
             BoosterRatioSet { stepup_value } => Double(
                 0b11111000,
                 match stepup_value {

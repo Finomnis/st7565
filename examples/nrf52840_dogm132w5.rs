@@ -58,8 +58,18 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let mut disp = ST7565DriverBuilder::new(disp_spi).build();
+    let mut disp = ST7565DriverBuilder::new(disp_spi)
+        .lcd_bias(false)
+        .power_control(PowerControlMode {
+            booster_circuit: false,
+            voltage_regulator_circuit: true,
+            voltage_follower_circuit: true,
+        })
+        .voltage_regulator_resistor_ratio(0b011)
+        .electric_volume(0b011111)
+        .build();
     disp.reset(&mut disp_rst, &mut timer).unwrap();
+    disp.set_static_indicator(0b10).unwrap();
 
     defmt::println!("Hello, world!");
 
