@@ -75,6 +75,7 @@ fn main() -> ! {
     let mut disp = ST7565::new(disp_spi, display_specs).into_graphics_mode::<132, 4>();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
+    disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
     loop {
