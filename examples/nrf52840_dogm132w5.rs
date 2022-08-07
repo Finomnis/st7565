@@ -6,8 +6,9 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
+use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
-use st7565::{BoosterRatio, DisplaySpecs, PowerControlMode, ST7565};
+use st7565::{st7565_driver, BoosterRatio, DisplaySpecs, PowerControlMode};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -35,8 +36,8 @@ fn main() -> ! {
     // Get DOGM132W-5 pins
     let mut disp_rst = port0.p0_12.into_push_pull_output(Level::High);
     let disp_cs = port1.p1_09.into_push_pull_output(Level::High).degrade();
-    let disp_a0 = port0.p0_23.into_push_pull_output(Level::Low).degrade();
-    let disp_scl = port0.p0_21.into_push_pull_output(Level::Low).degrade();
+    let disp_a0 = port0.p0_23.into_push_pull_output(Level::High).degrade();
+    let disp_scl = port0.p0_21.into_push_pull_output(Level::High).degrade();
     let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
 
     // Create DOGM132W-5 spi bus
@@ -48,7 +49,7 @@ fn main() -> ! {
                 mosi: Some(disp_si),
                 miso: None,
             },
-            hal::spim::Frequency::K500,
+            hal::spim::Frequency::M8,
             hal::spim::MODE_3,
             0,
         ),
@@ -66,17 +67,32 @@ fn main() -> ! {
         voltage_regulator_resistor_ratio: 0b011,
         electronic_volume: 0b011111,
         flip_rows: false,
-        flip_columns: false,
+        flip_columns: true,
         inverted: false,
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = ST7565::new(disp_spi, display_specs);
+    let mut disp = st7565_driver(disp_spi, display_specs).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
 
+    disp.set_page(2).unwrap();
+    disp.set_column(10).unwrap();
+    let mut data = [0u8; 100];
+    for (pos, val) in (&mut data).iter_mut().enumerate() {
+        *val = pos as u8;
+    }
+    disp.write_pixel_data(&data).unwrap();
+
     defmt::println!("Hello, world!");
 
-    loop {}
+    let mut scroll = 0;
+    loop {
+        //disp.set_inverted(scroll % 2 == 0).unwrap();
+        scroll = (scroll + 1) % 32;
+        timer.delay_ms(200u8);
+        timer.delay_ms(200u8);
+        timer.delay_ms(100u8);
+    }
 }

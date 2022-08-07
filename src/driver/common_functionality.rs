@@ -3,26 +3,12 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    BoosterRatio, DisplaySpecs, Error, PowerControlMode, StaticIndicatorMode,
+    DisplaySpecs, Error, StaticIndicatorMode,
 };
 
-/// ST7565 driver.
-pub struct ST7565<DI> {
-    interface: DI,
-    display_specs: DisplaySpecs,
-}
+use super::{ModeInit, ST7565};
 
-impl<DI> ST7565<DI>
-where
-    DI: WriteOnlyDataCommand,
-{
-    pub fn new(interface: DI, display_specs: DisplaySpecs) -> Self {
-        Self {
-            interface,
-            display_specs,
-        }
-    }
-
+impl<DI: WriteOnlyDataCommand, MODE> ST7565<DI, MODE> {
     /// Set the static indicator
     pub fn set_static_indicator(
         &mut self,
