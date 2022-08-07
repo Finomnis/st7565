@@ -48,6 +48,7 @@ where
         rst.set_low().map_err(Error::Pin)?;
         delay.delay_ms(1);
         rst.set_high().map_err(Error::Pin)?;
+        delay.delay_ms(1);
 
         // Initialize display
 
