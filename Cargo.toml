@@ -10,6 +10,7 @@ harness = false
 [dependencies]
 display-interface = "0.4.1"
 embedded-hal = "0.2.7"
+embedded-graphics-core = "0.3.3"
 
 [dev-dependencies]
 cortex-m = "0.7.3"
@@ -20,6 +21,7 @@ panic-probe = { version = "0.3.0", features = ["print-defmt"] }
 nrf52840-hal = "0.15.1"
 defmt-test = "0.3.0"
 display-interface-spi = "0.4.1"
+embedded-graphics = "0.7.1"
 
 # cargo build/run
 [profile.dev]

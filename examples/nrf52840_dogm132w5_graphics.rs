@@ -72,7 +72,7 @@ fn main() -> ! {
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = ST7565::new(disp_spi, display_specs).into_graphics_mode::<132, 4>();
+    let mut disp = ST7565::new(disp_spi, display_specs).into_graphics_mode::<132, 32, 4>();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
