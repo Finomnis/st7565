@@ -26,7 +26,7 @@ mod unit_tests {
                 Command::{self, *},
                 SendSt7565Command,
             },
-            BoosterRatio, PowerControlMode, StaticIndicatorMode,
+            types::{BoosterRatio, PowerControlMode, StaticIndicatorMode},
         };
         fn check_command(cmd: Command, result: &[u8]) {
             DisplayMock::expect_command(result)
@@ -82,21 +82,11 @@ mod unit_tests {
         check_command(DisplayNormalReverse { reverse: false }, &[0b10100110]);
         check_command(DisplayAllPoints { on: true }, &[0b10100101]);
         check_command(DisplayAllPoints { on: false }, &[0b10100100]);
-        check_command(LcdBiasSet { bias_1_7: true }, &[0b10100011]);
-        check_command(LcdBiasSet { bias_1_7: false }, &[0b10100010]);
-        check_command(Reset, &[0b11100010]);
-        check_command(
-            CommonOutputModeSelect {
-                reverse_direction: true,
-            },
-            &[0b11001000],
-        );
-        check_command(
-            CommonOutputModeSelect {
-                reverse_direction: false,
-            },
-            &[0b11000000],
-        );
+        check_command(LcdBiasSet { bias_mode_1: true }, &[0b10100011]);
+        check_command(LcdBiasSet { bias_mode_1: false }, &[0b10100010]);
+        //check_command(Reset, &[0b11100010]);
+        check_command(CommonOutputModeSelect { reverse: true }, &[0b11001000]);
+        check_command(CommonOutputModeSelect { reverse: false }, &[0b11000000]);
         check_command(
             PowerControlSet {
                 mode: PowerControlMode {
@@ -206,6 +196,6 @@ mod unit_tests {
             },
             &[0b11111000, 0b00000011],
         );
-        check_command(NOP, &[0b11100011]);
+        //check_command(NOP, &[0b11100011]);
     }
 }

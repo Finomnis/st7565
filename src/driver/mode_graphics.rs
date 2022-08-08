@@ -10,16 +10,14 @@ use embedded_graphics_core::{
 
 use crate::{
     command::{Command, SendSt7565Command},
-    ST7565,
+    DisplaySpecs, ST7565,
 };
 
-pub struct GraphicsMode<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
+pub struct GraphicsMode<const WIDTH: usize, const PAGES: usize> {
     page_buffers: [([u8; WIDTH], Option<Range<usize>>); PAGES],
 }
 
-impl<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    GraphicsMode<WIDTH, HEIGHT, PAGES>
-{
+impl<const WIDTH: usize, const PAGES: usize> GraphicsMode<WIDTH, PAGES> {
     pub fn new() -> Self {
         Self {
             // Fill with full dirty flags to force an initial synchronization
@@ -28,9 +26,21 @@ impl<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
     }
 }
 
-impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+/// ---- Functionality of the graphics mode ----
+/// ============================================
+///
+/// In this mode, the driver can be used as a [DrawTarget] for the [embedded_graphics](embedded_graphics_core) crate.
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
 {
+    /// Flushes the internal buffer to the screen.
+    ///
+    /// Needs to be called after drawing to actually display the data on screen.
     pub fn flush(&mut self) -> Result<(), DisplayError> {
         for (page, (buffer, dirty)) in self.mode.page_buffers.iter_mut().enumerate() {
             let page = page as u8;
@@ -51,8 +61,15 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
     }
 }
 
-impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    DrawTarget for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > DrawTarget for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+where
+    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
     type Color = BinaryColor;
     type Error = core::convert::Infallible;
@@ -91,8 +108,15 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
     }
 }
 
-impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    OriginDimensions for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > OriginDimensions for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+where
+    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
     fn size(&self) -> Size {
         Size {

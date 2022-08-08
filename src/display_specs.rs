@@ -1,31 +1,38 @@
-use crate::{BoosterRatio, PowerControlMode};
+use crate::types::{BoosterRatio, PowerControlMode};
 
-#[derive(Debug, Clone)]
 /// Represents a display specification
-pub struct DisplaySpecs {
+///
+/// Const generic parameters:
+///    - *WIDTH*: the horizontal resolution of the display
+///    - *HEIGHT*: the vertical resolution of the display
+///    - *PAGES*: the number of pages used by the display; usually *HEIGHT* / 8 (rounded up)
+///
+/// To create a custom display specification, create an empty struct that
+/// implements this trait.
+pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
     /// Mirrors vertically
-    pub flip_rows: bool,
+    const FLIP_ROWS: bool;
 
     /// Mirrors horizontally
-    pub flip_columns: bool,
+    const FLOP_COLUMNS: bool;
 
     /// Inverts the pixels
-    pub inverted: bool,
+    const INVERTED: bool;
 
     /// Whether the LCD bias mode needs to be "1".
     ///
     /// For more information, read the st7565 reference manual.
-    pub bias_mode_1: bool,
+    const BIAS_MODE_1: bool;
 
     /// Which parts of the internal power circuits need to be enabled
-    pub power_control: PowerControlMode,
+    const POWER_CONTROL: PowerControlMode;
 
     /// The required ratio of the internal voltage regulator resistors
-    pub voltage_regulator_resistor_ratio: u8,
+    const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8;
 
     /// The electronic volume of the driver stage
-    pub electronic_volume: u8,
+    const ELECTRONIC_VOLUME: u8;
 
     /// The internal booster ratio
-    pub booster_ratio: BoosterRatio,
+    const BOOSTER_RATIO: BoosterRatio;
 }

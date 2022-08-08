@@ -1,5 +1,6 @@
 #![no_main]
 #![no_std]
+//#![deny(missing_docs)]
 
 #[cfg(test)]
 mod tests;
@@ -9,9 +10,9 @@ mod display_specs;
 mod driver;
 mod error;
 
-pub use command::BoosterRatio;
-pub use command::PowerControlMode;
-pub use command::StaticIndicatorMode;
+pub mod displays;
+pub mod types;
+
 pub use display_specs::DisplaySpecs;
 pub use driver::ST7565;
 pub use error::Error;
