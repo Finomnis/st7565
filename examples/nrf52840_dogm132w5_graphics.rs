@@ -62,12 +62,13 @@ fn main() -> ! {
         disp_cs,
     );
 
-    // Build DOGM132W-5 display driver
+    // Create DOGM132W-5 display driver
     let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode();
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
+    // Play a cute little animation
     fn get_animation_frame(i: i32) -> (i32, u32) {
         let pos = if i > 100 { 200 - i } else { i };
         let size = if pos > 50 { 100 - pos } else { pos } / 3;

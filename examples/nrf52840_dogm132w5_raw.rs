@@ -57,7 +57,7 @@ fn main() -> ! {
         disp_cs,
     );
 
-    // Build DOGM132W-5 display driver
+    // Create DOGM132W-5 display driver
     let mut disp = ST7565::new(disp_spi, DOGM132W5).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
