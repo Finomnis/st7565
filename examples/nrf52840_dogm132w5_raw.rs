@@ -25,10 +25,7 @@ pub fn exit() -> ! {
 }
 
 struct DOGM132W5;
-impl DisplaySpecs for DOGM132W5 {
-    const RESOLUTION_HORIZONTAL: usize = 132;
-    const RESOLUTION_VERTICAL: usize = 32;
-    const REQUIRED_PAGES: usize = 4;
+impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
     const FLIP_ROWS: bool = false;
     const FLOP_COLUMNS: bool = true;
     const INVERTED: bool = false;

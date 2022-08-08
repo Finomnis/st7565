@@ -5,10 +5,10 @@ use crate::{DisplaySpecs, ST7565};
 
 pub struct RawMode;
 
-impl<DI, SPECS> ST7565<DI, SPECS, RawMode>
+impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
+    ST7565<DI, SPECS, RawMode, WIDTH, HEIGHT, PAGES>
 where
     DI: WriteOnlyDataCommand,
-    SPECS: DisplaySpecs,
 {
     pub fn set_page(&mut self, page: u8) -> Result<(), DisplayError> {
         self.interface

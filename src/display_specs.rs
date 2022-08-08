@@ -1,18 +1,7 @@
 use crate::{BoosterRatio, PowerControlMode};
 
 /// Represents a display specification
-pub trait DisplaySpecs {
-    /// The number of visible pixels in the horizontal direction
-    const RESOLUTION_HORIZONTAL: usize;
-
-    /// The number of visible pixels in the vertical direction
-    const RESOLUTION_VERTICAL: usize;
-
-    /// The number of pages required for the display.
-    ///
-    /// Usually RESOLUTION_VERTICAL / 8
-    const REQUIRED_PAGES: usize;
-
+pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
     /// Mirrors vertically
     const FLIP_ROWS: bool;
 

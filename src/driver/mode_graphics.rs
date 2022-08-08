@@ -1,4 +1,4 @@
-use core::{marker::PhantomData, ops::Range};
+use core::ops::Range;
 
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 use embedded_graphics_core::{
@@ -13,34 +13,33 @@ use crate::{
     DisplaySpecs, ST7565,
 };
 
-pub struct GraphicsMode<SPECS: DisplaySpecs> {
-    page_buffers:
-        [([u8; SPECS::RESOLUTION_HORIZONTAL], Option<Range<usize>>); SPECS::REQUIRED_PAGES],
-    _specs: PhantomData<SPECS>,
+pub struct GraphicsMode<const WIDTH: usize, const PAGES: usize> {
+    page_buffers: [([u8; WIDTH], Option<Range<usize>>); PAGES],
 }
 
-impl<SPECS: DisplaySpecs> GraphicsMode<SPECS> {
+impl<const WIDTH: usize, const PAGES: usize> GraphicsMode<WIDTH, PAGES> {
     pub fn new() -> Self {
         Self {
             // Fill with full dirty flags to force an initial synchronization
-            page_buffers: [(); SPECS::REQUIRED_PAGES].map(|()| {
-                (
-                    [0; SPECS::RESOLUTION_HORIZONTAL],
-                    Some(0..SPECS::RESOLUTION_HORIZONTAL),
-                )
-            }),
-            _specs: PhantomData,
+            page_buffers: [(); PAGES].map(|()| ([0; WIDTH], Some(0..WIDTH))),
         }
     }
 }
 
-impl<DI: WriteOnlyDataCommand, SPECS: DisplaySpecs> ST7565<DI, SPECS, GraphicsMode<SPECS>> {
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+{
     pub fn flush(&mut self) -> Result<(), DisplayError> {
         for (page, (buffer, dirty)) in self.mode.page_buffers.iter_mut().enumerate() {
             let page = page as u8;
 
             if let Some(range) = dirty.take() {
-                if range.start < range.end && range.start < SPECS::RESOLUTION_HORIZONTAL {
+                if range.start < range.end && range.start < WIDTH {
                     self.interface
                         .send_command(Command::PageAddressSet { address: page })?;
                     self.interface.send_command(Command::ColumnAddressSet {
@@ -55,8 +54,15 @@ impl<DI: WriteOnlyDataCommand, SPECS: DisplaySpecs> ST7565<DI, SPECS, GraphicsMo
     }
 }
 
-impl<DI: WriteOnlyDataCommand, SPECS: DisplaySpecs> DrawTarget
-    for ST7565<DI, SPECS, GraphicsMode<SPECS>>
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > DrawTarget for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+where
+    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
     type Color = BinaryColor;
     type Error = core::convert::Infallible;
@@ -95,13 +101,20 @@ impl<DI: WriteOnlyDataCommand, SPECS: DisplaySpecs> DrawTarget
     }
 }
 
-impl<DI: WriteOnlyDataCommand, SPECS: DisplaySpecs> OriginDimensions
-    for ST7565<DI, SPECS, GraphicsMode<SPECS>>
+impl<
+        DI: WriteOnlyDataCommand,
+        SPECS,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > OriginDimensions for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+where
+    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
     fn size(&self) -> Size {
         Size {
-            width: SPECS::RESOLUTION_HORIZONTAL as u32,
-            height: SPECS::RESOLUTION_VERTICAL as u32,
+            width: WIDTH as u32,
+            height: HEIGHT as u32,
         }
     }
 }
