@@ -83,7 +83,7 @@ fn main() -> ! {
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
-    Circle::new(Point::new(10, 15), 20)
+    Circle::new(Point::new(15, 6), 20)
         .into_styled(
             PrimitiveStyleBuilder::new()
                 .stroke_color(BinaryColor::On)
