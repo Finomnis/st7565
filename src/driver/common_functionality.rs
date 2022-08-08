@@ -59,7 +59,7 @@ where
         // ADC Selection
         self.interface
             .send_command(Command::AdcSelect {
-                reverse: SPECS::FLOP_COLUMNS,
+                reverse: SPECS::FLIP_COLUMNS,
             })
             .map_err(Error::Comm)?;
 

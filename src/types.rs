@@ -14,7 +14,7 @@ pub struct PowerControlMode {
     pub voltage_follower_circuit: bool,
 }
 
-/// The possible options for the internal booster ratio
+/// The possible options for the static indicator
 #[derive(Debug, Copy, Clone)]
 pub enum StaticIndicatorMode {
     Off,

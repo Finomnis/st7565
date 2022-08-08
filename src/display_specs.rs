@@ -14,7 +14,7 @@ pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usi
     const FLIP_ROWS: bool;
 
     /// Mirrors horizontally
-    const FLOP_COLUMNS: bool;
+    const FLIP_COLUMNS: bool;
 
     /// Inverts the pixels
     const INVERTED: bool;
