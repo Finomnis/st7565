@@ -1,6 +1,14 @@
-use crate::{BoosterRatio, PowerControlMode};
+use crate::types::{BoosterRatio, PowerControlMode};
 
 /// Represents a display specification
+///
+/// Const generic parameters:
+///    - *WIDTH*: the horizontal resolution of the display
+///    - *HEIGHT*: the vertical resolution of the display
+///    - *PAGES*: the number of pages used by the display; usually *HEIGHT* / 8 (rounded up)
+///
+/// To create a custom display specification, create an empty struct that
+/// implements this trait.
 pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
     /// Mirrors vertically
     const FLIP_ROWS: bool;

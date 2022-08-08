@@ -3,11 +3,14 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    DisplaySpecs, Error, StaticIndicatorMode,
+    types::StaticIndicatorMode,
+    DisplaySpecs, Error,
 };
 
 use super::ST7565;
 
+/// ---- Common functionality for all modes ----
+/// ============================================
 impl<DI, SPECS, MODE, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
     ST7565<DI, SPECS, MODE, WIDTH, HEIGHT, PAGES>
 where
@@ -63,7 +66,7 @@ where
         // Common output mode selection
         self.interface
             .send_command(Command::CommonOutputModeSelect {
-                reverse_direction: SPECS::FLIP_ROWS,
+                reverse: SPECS::FLIP_ROWS,
             })
             .map_err(Error::Comm)?;
 

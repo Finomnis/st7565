@@ -26,6 +26,10 @@ impl<const WIDTH: usize, const PAGES: usize> GraphicsMode<WIDTH, PAGES> {
     }
 }
 
+/// ---- Functionality of the graphics mode ----
+/// ============================================
+///
+/// In this mode, the driver can be used as a [DrawTarget] for the [embedded_graphics](embedded_graphics_core) crate.
 impl<
         DI: WriteOnlyDataCommand,
         SPECS,
@@ -34,6 +38,9 @@ impl<
         const PAGES: usize,
     > ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
 {
+    /// Flushes the internal buffer to the screen.
+    ///
+    /// Needs to be called after drawing to actually display the data on screen.
     pub fn flush(&mut self) -> Result<(), DisplayError> {
         for (page, (buffer, dirty)) in self.mode.page_buffers.iter_mut().enumerate() {
             let page = page as u8;
