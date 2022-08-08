@@ -22,6 +22,7 @@ impl<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
 {
     pub fn new() -> Self {
         Self {
+            // Fill with full dirty flags to force an initial synchronization
             page_buffers: [(); PAGES].map(|()| ([0; WIDTH], Some(0..WIDTH))),
         }
     }
@@ -41,7 +42,7 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
                     self.interface.send_command(Command::ColumnAddressSet {
                         address: range.start as u8,
                     })?;
-                    self.interface.send_data(U8(buffer))?;
+                    self.interface.send_data(U8(&buffer[range]))?;
                 }
             }
         }
@@ -61,7 +62,29 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
         I: IntoIterator<Item = Pixel<Self::Color>>,
     {
         for Pixel(Point { x, y }, color) in pixels.into_iter() {
-            todo!()
+            let x = x as usize;
+            let page = (y / 8) as usize;
+            let y_offset = (y % 8) as u8;
+
+            if let Some((buffer, dirty)) = self.mode.page_buffers.get_mut(page) {
+                if let Some(buffer_line) = buffer.get_mut(x) {
+                    let updated = match color {
+                        BinaryColor::On => *buffer_line | (1u8 << y_offset),
+                        BinaryColor::Off => *buffer_line & (!(1u8 << y_offset)),
+                    };
+
+                    if updated != *buffer_line {
+                        match dirty {
+                            Some(dirty_range) => {
+                                dirty_range.start = dirty_range.start.min(x);
+                                dirty_range.end = dirty_range.end.max(x + 1);
+                            }
+                            None => *dirty = Some(x..(x + 1)),
+                        };
+                        *buffer_line = updated;
+                    }
+                }
+            }
         }
 
         Ok(())

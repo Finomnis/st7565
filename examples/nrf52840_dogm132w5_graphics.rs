@@ -6,6 +6,11 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
+use embedded_graphics::{
+    pixelcolor::BinaryColor,
+    prelude::*,
+    primitives::{Circle, PrimitiveStyleBuilder},
+};
 use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
 use st7565::{BoosterRatio, DisplaySpecs, PowerControlMode, ST7565};
@@ -58,7 +63,7 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let display_specs = DisplaySpecs {
+    let disp_specs = DisplaySpecs {
         power_control: PowerControlMode {
             booster_circuit: true,
             voltage_regulator_circuit: true,
@@ -72,11 +77,24 @@ fn main() -> ! {
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = ST7565::new(disp_spi, display_specs).into_graphics_mode::<132, 32, 4>();
+    let mut disp = ST7565::new(disp_spi, disp_specs).into_graphics_mode::<132, 32, 4>();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
+
+    Circle::new(Point::new(10, 15), 20)
+        .into_styled(
+            PrimitiveStyleBuilder::new()
+                .stroke_color(BinaryColor::On)
+                .stroke_width(1)
+                .fill_color(BinaryColor::Off)
+                .build(),
+        )
+        .draw(&mut disp)
+        .unwrap();
+
+    disp.flush().unwrap();
 
     loop {
         timer.delay_ms(100u8);

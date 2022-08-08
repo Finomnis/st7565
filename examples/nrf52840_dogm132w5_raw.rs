@@ -58,7 +58,7 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let display_specs = DisplaySpecs {
+    let disp_specs = DisplaySpecs {
         power_control: PowerControlMode {
             booster_circuit: true,
             voltage_regulator_circuit: true,
@@ -72,7 +72,7 @@ fn main() -> ! {
         bias_mode_1: false,
         booster_ratio: BoosterRatio::StepUp2x3x4x,
     };
-    let mut disp = ST7565::new(disp_spi, display_specs).into_raw_mode();
+    let mut disp = ST7565::new(disp_spi, disp_specs).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
