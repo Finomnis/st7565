@@ -9,7 +9,7 @@ use display_interface_spi::SPIInterface;
 use embedded_graphics::{
     pixelcolor::BinaryColor,
     prelude::*,
-    primitives::{Circle, PrimitiveStyleBuilder},
+    primitives::{Circle, PrimitiveStyle},
 };
 use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
@@ -82,21 +82,30 @@ fn main() -> ! {
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
-
-    Circle::new(Point::new(15, 6), 20)
-        .into_styled(
-            PrimitiveStyleBuilder::new()
-                .stroke_color(BinaryColor::On)
-                .stroke_width(1)
-                .fill_color(BinaryColor::Off)
-                .build(),
-        )
-        .draw(&mut disp)
-        .unwrap();
-
     disp.flush().unwrap();
 
+    fn get_frame(i: i32) -> (i32, u32) {
+        let pos = if i > 100 { 200 - i } else { i };
+        let size = if pos > 50 { 100 - pos } else { pos } / 3;
+        (pos, size as u32)
+    }
+
+    let mut i = 0;
     loop {
         timer.delay_ms(100u8);
+
+        let (pos, size) = get_frame(i);
+        Circle::new(Point::new(pos, 6), size)
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::Off, 2))
+            .draw(&mut disp)
+            .unwrap();
+
+        i = (i + 1) % 200;
+        let (pos, size) = get_frame(i);
+        Circle::new(Point::new(pos, 6), size)
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .draw(&mut disp)
+            .unwrap();
+        disp.flush().unwrap();
     }
 }
