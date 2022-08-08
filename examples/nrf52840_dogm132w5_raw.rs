@@ -24,6 +24,25 @@ pub fn exit() -> ! {
     }
 }
 
+struct DOGM132W5;
+impl DisplaySpecs for DOGM132W5 {
+    const RESOLUTION_HORIZONTAL: usize = 132;
+    const RESOLUTION_VERTICAL: usize = 32;
+    const REQUIRED_PAGES: usize = 4;
+    const FLIP_ROWS: bool = false;
+    const FLOP_COLUMNS: bool = true;
+    const INVERTED: bool = false;
+    const BIAS_MODE_1: bool = false;
+    const POWER_CONTROL: PowerControlMode = PowerControlMode {
+        booster_circuit: true,
+        voltage_regulator_circuit: true,
+        voltage_follower_circuit: true,
+    };
+    const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8 = 0b011;
+    const ELECTRONIC_VOLUME: u8 = 0b011111;
+    const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
+}
+
 #[cortex_m_rt::entry]
 fn main() -> ! {
     let peripherals = hal::pac::Peripherals::take().unwrap();
@@ -58,21 +77,7 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let disp_specs = DisplaySpecs {
-        power_control: PowerControlMode {
-            booster_circuit: true,
-            voltage_regulator_circuit: true,
-            voltage_follower_circuit: true,
-        },
-        voltage_regulator_resistor_ratio: 0b011,
-        electronic_volume: 0b011111,
-        flip_rows: false,
-        flip_columns: true,
-        inverted: false,
-        bias_mode_1: false,
-        booster_ratio: BoosterRatio::StepUp2x3x4x,
-    };
-    let mut disp = ST7565::new(disp_spi, disp_specs).into_raw_mode();
+    let mut disp = ST7565::new(disp_spi, DOGM132W5).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();

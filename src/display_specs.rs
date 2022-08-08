@@ -1,13 +1,41 @@
 use crate::{BoosterRatio, PowerControlMode};
 
-#[derive(Debug, Clone)]
-pub struct DisplaySpecs {
-    pub flip_rows: bool,
-    pub flip_columns: bool,
-    pub inverted: bool,
-    pub bias_mode_1: bool,
-    pub power_control: PowerControlMode,
-    pub voltage_regulator_resistor_ratio: u8,
-    pub electronic_volume: u8,
-    pub booster_ratio: BoosterRatio,
+/// Represents a display specification
+pub trait DisplaySpecs {
+    /// The number of visible pixels in the horizontal direction
+    const RESOLUTION_HORIZONTAL: usize;
+
+    /// The number of visible pixels in the vertical direction
+    const RESOLUTION_VERTICAL: usize;
+
+    /// The number of pages required for the display.
+    ///
+    /// Usually RESOLUTION_VERTICAL / 8
+    const REQUIRED_PAGES: usize;
+
+    /// Mirrors vertically
+    const FLIP_ROWS: bool;
+
+    /// Mirrors horizontally
+    const FLOP_COLUMNS: bool;
+
+    /// Inverts the pixels
+    const INVERTED: bool;
+
+    /// Whether the LCD bias mode needs to be "1".
+    ///
+    /// For more information, read the st7565 reference manual.
+    const BIAS_MODE_1: bool;
+
+    /// Which parts of the internal power circuits need to be enabled
+    const POWER_CONTROL: PowerControlMode;
+
+    /// The required ratio of the internal voltage regulator resistors
+    const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8;
+
+    /// The electronic volume of the driver stage
+    const ELECTRONIC_VOLUME: u8;
+
+    /// The internal booster ratio
+    const BOOSTER_RATIO: BoosterRatio;
 }

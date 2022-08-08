@@ -3,12 +3,16 @@ use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},
-    Error, StaticIndicatorMode,
+    DisplaySpecs, Error, StaticIndicatorMode,
 };
 
 use super::ST7565;
 
-impl<DI: WriteOnlyDataCommand, MODE> ST7565<DI, MODE> {
+impl<DI, SPECS, MODE> ST7565<DI, SPECS, MODE>
+where
+    DI: WriteOnlyDataCommand,
+    SPECS: DisplaySpecs,
+{
     /// Set the static indicator
     pub fn set_static_indicator(
         &mut self,
@@ -44,56 +48,56 @@ impl<DI: WriteOnlyDataCommand, MODE> ST7565<DI, MODE> {
         // LCD Bias
         self.interface
             .send_command(Command::LcdBiasSet {
-                bias_mode_1: self.display_specs.bias_mode_1,
+                bias_mode_1: SPECS::BIAS_MODE_1,
             })
             .map_err(Error::Comm)?;
 
         // ADC Selection
         self.interface
             .send_command(Command::AdcSelect {
-                reverse: self.display_specs.flip_columns,
+                reverse: SPECS::FLOP_COLUMNS,
             })
             .map_err(Error::Comm)?;
 
         // Common output mode selection
         self.interface
             .send_command(Command::CommonOutputModeSelect {
-                reverse_direction: self.display_specs.flip_rows,
+                reverse_direction: SPECS::FLIP_ROWS,
             })
             .map_err(Error::Comm)?;
 
         // Display invertion
         self.interface
             .send_command(Command::DisplayNormalReverse {
-                reverse: self.display_specs.inverted,
+                reverse: SPECS::INVERTED,
             })
             .map_err(Error::Comm)?;
 
         // Booster ratio
         self.interface
             .send_command(Command::BoosterRatioSet {
-                stepup_value: self.display_specs.booster_ratio,
+                stepup_value: SPECS::BOOSTER_RATIO,
             })
             .map_err(Error::Comm)?;
 
         // voltage regulator resistor ratio
         self.interface
             .send_command(Command::VoltageRegulatorInternalResistorSet {
-                resistor_ratio: self.display_specs.voltage_regulator_resistor_ratio,
+                resistor_ratio: SPECS::VOLTAGE_REGULATOR_RESISTOR_RATIO,
             })
             .map_err(Error::Comm)?;
 
         // electric volume
         self.interface
             .send_command(Command::ElectronicVolumeSet {
-                volume_value: self.display_specs.electronic_volume,
+                volume_value: SPECS::ELECTRONIC_VOLUME,
             })
             .map_err(Error::Comm)?;
 
         // power control
         self.interface
             .send_command(Command::PowerControlSet {
-                mode: self.display_specs.power_control,
+                mode: SPECS::POWER_CONTROL,
             })
             .map_err(Error::Comm)?;
 
