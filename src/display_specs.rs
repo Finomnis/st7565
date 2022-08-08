@@ -2,7 +2,7 @@ use crate::{BoosterRatio, PowerControlMode};
 
 #[derive(Debug, Clone)]
 /// Represents a display specification
-pub struct DisplaySpecs {
+pub struct DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
     /// Mirrors vertically
     pub flip_rows: bool,
 

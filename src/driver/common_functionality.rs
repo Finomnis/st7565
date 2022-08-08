@@ -8,7 +8,14 @@ use crate::{
 
 use super::ST7565;
 
-impl<DI: WriteOnlyDataCommand, MODE> ST7565<DI, MODE> {
+impl<
+        DI: WriteOnlyDataCommand,
+        MODE,
+        const WIDTH: usize,
+        const HEIGHT: usize,
+        const PAGES: usize,
+    > ST7565<DI, MODE, WIDTH, HEIGHT, PAGES>
+{
     /// Set the static indicator
     pub fn set_static_indicator(
         &mut self,

@@ -29,7 +29,7 @@ impl<const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
 }
 
 impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+    ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>, WIDTH, HEIGHT, PAGES>
 {
     pub fn flush(&mut self) -> Result<(), DisplayError> {
         for (page, (buffer, dirty)) in self.mode.page_buffers.iter_mut().enumerate() {
@@ -52,7 +52,7 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
 }
 
 impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    DrawTarget for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+    DrawTarget for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>, WIDTH, HEIGHT, PAGES>
 {
     type Color = BinaryColor;
     type Error = core::convert::Infallible;
@@ -92,7 +92,7 @@ impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PA
 }
 
 impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
-    OriginDimensions for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>>
+    OriginDimensions for ST7565<DI, GraphicsMode<WIDTH, HEIGHT, PAGES>, WIDTH, HEIGHT, PAGES>
 {
     fn size(&self) -> Size {
         Size {

@@ -58,7 +58,7 @@ fn main() -> ! {
     );
 
     // Build DOGM132W-5 display driver
-    let disp_specs = DisplaySpecs {
+    let disp_specs = DisplaySpecs::<132, 32, 4> {
         power_control: PowerControlMode {
             booster_circuit: true,
             voltage_regulator_circuit: true,

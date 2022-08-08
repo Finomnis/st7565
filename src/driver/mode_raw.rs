@@ -5,7 +5,9 @@ use crate::ST7565;
 
 pub struct RawMode;
 
-impl<DI: WriteOnlyDataCommand> ST7565<DI, RawMode> {
+impl<DI: WriteOnlyDataCommand, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
+    ST7565<DI, RawMode, WIDTH, HEIGHT, PAGES>
+{
     pub fn set_page(&mut self, page: u8) -> Result<(), DisplayError> {
         self.interface
             .send_command(Command::PageAddressSet { address: page })
