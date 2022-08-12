@@ -1,259 +1,90 @@
-# `app-template`
+# `st7565`
 
-> Quickly set up a [`probe-run`] + [`defmt`] + [`flip-link`] embedded project
+This crate aims to provide an
+[embedded-graphics](https://crates.io/crates/embedded-graphics)
+compatible driver for displays based on the st7565 chipset.
 
-[`probe-run`]: https://crates.io/crates/probe-run
-[`defmt`]: https://github.com/knurling-rs/defmt
-[`flip-link`]: https://github.com/knurling-rs/flip-link
+## Usage
 
-## Dependencies
+- set up spi bus (refer to your display which clock mode is used)
 
-#### 1. `flip-link`:
+## Example:
 
-```console
-$ cargo install flip-link
+The following code is intended for the DOGM132W-5 display connected to an nRF52840
+microcontroller.
+
+Note the `MODE_3` of the SPI. The DOGM132W-5 display expects the clock to be configured
+with `CPOL=1` and `CPHA=1`, which is also called `SPI Mode 3`.
+
+```Rust
+// Create DOGM132W-5 spi bus
+let disp_spi = SPIInterface::new(
+    hal::Spim::new(
+        peripherals.SPIM0,
+        hal::spim::Pins {
+            sck: disp_scl,
+            mosi: Some(disp_si),
+            miso: None,
+        },
+        hal::spim::Frequency::M8,
+        hal::spim::MODE_3,
+        0,
+    ),
+    disp_a0,
+    disp_cs,
+);
+
+// Create DOGM132W-5 display driver
+let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode();
+disp.reset(&mut disp_rst, &mut timer).unwrap();
+disp.flush().unwrap();
+disp.set_display_on(true).unwrap();
+
+// Draw on it using the embedded_graphics library
+Circle::new(Point::new(10, 6), 20)
+    .into_styled(PrimitiveStyle::with_stroke(BinaryColor::Off, 2))
+    .draw(&mut disp)
+    .unwrap();
+disp.flush().unwrap();
 ```
 
-#### 2. `probe-run`:
+Note the `DOGM132W5` object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
 
-``` console
-$ # make sure to install v0.2.0 or later
-$ cargo install probe-run
-```
+Further note the `.into_graphics_mode()` call, which switches the driver from its initial
+mode to the [embedded-graphics](https://crates.io/crates/embedded-graphics) driver mode.
+The `disp` object can then be used as a `DrawTarget` in `embedded-graphics` calls.
 
-#### 3. [`cargo-generate`]:
-
-``` console
-$ cargo install cargo-generate
-```
-
-[`cargo-generate`]: https://crates.io/crates/cargo-generate
-
-> *Note:* You can also just clone this repository instead of using `cargo-generate`, but this involves additional manual adjustments.
-
-## Setup
-
-#### 1. Initialize the project template
-
-``` console
-$ cargo generate \
-    --git https://github.com/knurling-rs/app-template \
-    --branch main \
-    --name my-app
-```
-
-If you look into your new `my-app` folder, you'll find that there are a few `TODO`s in the files marking the properties you need to set.
-
-Let's walk through them together now.
-
-#### 2. Set `probe-run` chip
-
-Pick a chip from `probe-run --list-chips` and enter it into `.cargo/config.toml`.
-
-If, for example, you have a nRF52840 Development Kit from one of [our workshops], replace `{{chip}}` with `nRF52840_xxAA`.
-
-[our workshops]: https://github.com/ferrous-systems/embedded-trainings-2020
-
-``` diff
- # .cargo/config.toml
- [target.'cfg(all(target_arch = "arm", target_os = "none"))']
--runner = "probe-run --chip {{chip}}"
-+runner = "probe-run --chip nRF52840_xxAA"
-```
-
-#### 3. Adjust the compilation target
-
-In `.cargo/config.toml`, pick the right compilation target for your board.
-
-``` diff
- # .cargo/config.toml
- [build]
--target = "thumbv6m-none-eabi"    # Cortex-M0 and Cortex-M0+
--# target = "thumbv7m-none-eabi"    # Cortex-M3
--# target = "thumbv7em-none-eabi"   # Cortex-M4 and Cortex-M7 (no FPU)
--# target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
-+target = "thumbv7em-none-eabihf" # Cortex-M4F (with FPU)
-```
-
-Add the target with `rustup`.
-
-``` console
-$ rustup target add thumbv7em-none-eabihf
-```
-
-#### 4. Add a HAL as a dependency
-
-In `Cargo.toml`, list the Hardware Abstraction Layer (HAL) for your board as a dependency.
-
-For the nRF52840 you'll want to use the [`nrf52840-hal`].
-
-[`nrf52840-hal`]: https://crates.io/crates/nrf52840-hal
-
-``` diff
- # Cargo.toml
- [dependencies]
--# some-hal = "1.2.3"
-+nrf52840-hal = "0.14.0"
-```
-
-#### 5. Import your HAL
-
-Now that you have selected a HAL, fix the HAL import in `src/lib.rs`
-
-``` diff
- // my-app/src/lib.rs
--// use some_hal as _; // memory layout
-+use nrf52840_hal as _; // memory layout
-```
-
-#### (6. Get a linker script)
-
-Some HAL crates require that you manually copy over a file called `memory.x` from the HAL to the root of your project. For nrf52840-hal, this is done automatically so no action is needed. For other HAL crates, you can get it from your local Cargo folder, the default location is under:
-
-```
-~/.cargo/registry/src/
-```
-
-Not all HALs provide a `memory.x` file, you may need to write it yourself. Check the documentation for the HAL you are using.
+After drawing something, a `.flush()` call has to be issued to actually
+send the modified data to the display.
 
 
-#### 7. Run!
+## Adding support for a new st7565 based display
 
-You are now all set to `cargo-run` your first `defmt`-powered application!
-There are some examples in the `src/bin` directory.
+The example above uses the `DOGM132W5` struct in the `ST7565::new()` call.
 
-Start by `cargo run`-ning `my-app/src/bin/hello.rs`:
+To initialize the `ST7565` driver struct with a different display, a new display
+specification has to be created. This can be done by creating an empty struct that
+implements the `DisplaySpecs` object.
 
-``` console
-$ # `rb` is an alias for `run --bin`
-$ cargo rb hello
-    Finished dev [optimized + debuginfo] target(s) in 0.03s
-flashing program ..
-DONE
-resetting device
-0.000000 INFO Hello, world!
-(..)
-
-$ echo $?
-0
-```
-
-If you're running out of memory (`flip-link` bails with an overflow error), you can decrease the size of the device memory buffer by setting the `DEFMT_RTT_BUFFER_SIZE` environment variable. The default value is 1024 bytes, and powers of two should be used for optimal performance:
-
-``` console
-$ DEFMT_RTT_BUFFER_SIZE=64 cargo rb hello
-```
-
-#### (8. Set `rust-analyzer.linkedProjects`)
-
-If you are using [rust-analyzer] with VS Code for IDE-like features you can add following configuration to your `.vscode/settings.json` to make it work transparently across workspaces. Find the details of this option in the [RA docs].
-
-```json
-{
-    "rust-analyzer.linkedProjects": [
-        "Cargo.toml",
-        "firmware/Cargo.toml",
-    ]
+For example, the definition for the `DOGM132W5` struct looks like this:
+```Rust
+pub struct DOGM132W5;
+impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
+    const FLIP_ROWS: bool = false;
+    const FLIP_COLUMNS: bool = true;
+    const INVERTED: bool = false;
+    const BIAS_MODE_1: bool = false;
+    const POWER_CONTROL: PowerControlMode = PowerControlMode {
+        booster_circuit: true,
+        voltage_regulator_circuit: true,
+        voltage_follower_circuit: true,
+    };
+    const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8 = 0b011;
+    const ELECTRONIC_VOLUME: u8 = 0b011111;
+    const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
 }
 ```
 
-[RA docs]: https://rust-analyzer.github.io/manual.html#configuration
-[rust-analyzer]: https://rust-analyzer.github.io/
+The exact values for the respective display have to be taken from the displays manual.
 
-## Running tests
-
-The template comes configured for running unit tests and integration tests on the target.
-
-Unit tests reside in the library crate and can test private API; the initial set of unit tests are in `src/lib.rs`.
-`cargo test --lib` will run those unit tests.
-
-``` console
-$ cargo test --lib
-(1/1) running `it_works`...
-└─ app::unit_tests::__defmt_test_entry @ src/lib.rs:33
-all tests passed!
-└─ app::unit_tests::__defmt_test_entry @ src/lib.rs:28
-```
-
-Integration tests reside in the `tests` directory; the initial set of integration tests are in `tests/integration.rs`.
-`cargo test --test integration` will run those integration tests.
-Note that the argument of the `--test` flag must match the name of the test file in the `tests` directory.
-
-``` console
-$ cargo test --test integration
-(1/1) running `it_works`...
-└─ integration::tests::__defmt_test_entry @ tests/integration.rs:13
-all tests passed!
-└─ integration::tests::__defmt_test_entry @ tests/integration.rs:8
-```
-
-Note that to add a new test file to the `tests` directory you also need to add a new `[[test]]` section to `Cargo.toml`.
-
-## Trying out the git version of defmt
-
-This template is configured to use the latest crates.io release (the "stable" release) of the `defmt` framework.
-To use the git version (the "development" version) of `defmt` follow these steps:
-
-1. Install the *git* version of `probe-run`
-
-``` console
-$ cargo install --git https://github.com/knurling-rs/probe-run --branch main
-```
-
-2. Check which defmt version `probe-run` supports
-
-``` console
-$ probe-run --version
-0.2.0 (aa585f2 2021-02-22)
-supported defmt version: 60c6447f8ecbc4ff023378ba6905bcd0de1e679f
-```
-
-In the example output, the supported version is `60c6447f8ecbc4ff023378ba6905bcd0de1e679f`
-
-3. Switch defmt dependencies to git: uncomment the last part of the root `Cargo.toml` and enter the hash reported by `probe-run --version`:
-
-``` diff
--# [patch.crates-io]
--# defmt = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version reported by `probe-run --version`" }
--# defmt-rtt = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version reported by `probe-run --version`" }
--# defmt-test = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version reported by `probe-run --version`" }
--# panic-probe = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version reported by `probe-run --version`" }
-+[patch.crates-io]
-+defmt = { git = "https://github.com/knurling-rs/defmt", rev = "60c6447f8ecbc4ff023378ba6905bcd0de1e679f" }
-+defmt-rtt = { git = "https://github.com/knurling-rs/defmt", rev = "60c6447f8ecbc4ff023378ba6905bcd0de1e679f" }
-+defmt-test = { git = "https://github.com/knurling-rs/defmt", rev = "60c6447f8ecbc4ff023378ba6905bcd0de1e679f" }
-+panic-probe = { git = "https://github.com/knurling-rs/defmt", rev = "60c6447f8ecbc4ff023378ba6905bcd0de1e679f" }
-```
-
-You are now using the git version of `defmt`!
-
-**NOTE** there may have been breaking changes between the crates.io version and the git version; you'll need to fix those in the source code.
-
-## Support
-
-`app-template` is part of the [Knurling] project, [Ferrous Systems]' effort at
-improving tooling used to develop for embedded systems.
-
-If you think that our work is useful, consider sponsoring it via [GitHub
-Sponsors].
-
-## License
-
-Licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
-
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-### Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-licensed as above, without any additional terms or conditions.
-
-[Knurling]: https://knurling.ferrous-systems.com
-[Ferrous Systems]: https://ferrous-systems.com/
-[GitHub Sponsors]: https://github.com/sponsors/knurling-rs
+If you created a specification for a new display, please open a pull request on https://github.com/Finomnis/st7565/pulls in order to make it available to the public.

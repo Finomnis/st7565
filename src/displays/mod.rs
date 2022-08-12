@@ -1,8 +1,11 @@
+//! Specifications for specific displays
+
 use crate::{
     types::{BoosterRatio, PowerControlMode},
     DisplaySpecs,
 };
 
+/// Display specification for the DOGM132W-5 display
 pub struct DOGM132W5;
 impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
     const FLIP_ROWS: bool = false;
