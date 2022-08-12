@@ -6,7 +6,7 @@ mod mode_raw;
 
 use core::marker::PhantomData;
 
-/// ST7565 driver.
+/// The actual driver
 pub struct ST7565<DI, SPECS, MODE, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> {
     interface: DI,
     display_specs: PhantomData<SPECS>,
