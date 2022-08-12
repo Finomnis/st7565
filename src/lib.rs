@@ -1,6 +1,7 @@
 #![no_main]
 #![no_std]
 //#![deny(missing_docs)]
+#![forbid(unsafe_code)]
 
 #[cfg(test)]
 mod tests;
