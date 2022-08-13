@@ -3,7 +3,7 @@
 //! [embedded-graphics](https://crates.io/crates/embedded-graphics)
 //! compatible driver for displays based on the st7565 chipset.
 //!
-//! ## Example:
+//! ## Example
 //!
 //! The following code is intended for the [DOGM132W-5](https://www.displayvisions.us/products/dog.html) display connected to an [nRF52840](https://www.nordicsemi.com/products/nrf52840)
 //! microcontroller.
@@ -53,7 +53,7 @@
 //! send the modified data to the display.
 //!
 //!
-//! ## Adding support for new st7565 based displays:
+//! ## Adding support for new st7565 based displays
 //!
 //! The example above uses the [`DOGM132W5`](displays::DOGM132W5) struct in the [`ST7565::new()`] call.
 //!
