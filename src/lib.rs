@@ -43,25 +43,25 @@
 //! disp.flush().unwrap();
 //! ```
 //!
-//! Note the `DOGM132W5` object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
+//! Note the [`DOGM132W5`](displays::DOGM132W5) object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
 //!
-//! Further note the `.into_graphics_mode()` call, which switches the driver from its initial
-//! mode to the [embedded-graphics](https://crates.io/crates/embedded-graphics) driver mode.
-//! The `disp` object can then be used as a `DrawTarget` in `embedded-graphics` calls.
+//! Further note the [`into_graphics_mode()`](ST7565::into_graphics_mode()) call, which switches the driver from its initial
+//! mode to the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) driver mode.
+//! The `disp` object can then be used as a [`DrawTarget`](embedded_graphics_core::draw_target::DrawTarget) in [`embedded-graphics`](https://crates.io/crates/embedded-graphics) calls.
 //!
-//! After drawing something, a `.flush()` call has to be issued to actually
+//! After drawing something, a [`flush()`](ST7565::flush()) call has to be issued to actually
 //! send the modified data to the display.
 //!
 //!
 //! ## Adding support for a new st7565 based display
 //!
-//! The example above uses the `DOGM132W5` struct in the `ST7565::new()` call.
+//! The example above uses the [`DOGM132W5`](displays::DOGM132W5) struct in the [`ST7565::new()`] call.
 //!
 //! To initialize the `ST7565` driver struct with a different display, a new display
 //! specification has to be created. This can be done by creating an empty struct that
-//! implements the [DisplaySpecs] object.
+//! implements the [`DisplaySpecs`] object.
 //!
-//! For example, the definition of the `DOGM132W5` struct looks like this:
+//! For example, the definition of the [`DOGM132W5`](displays::DOGM132W5) struct looks like this:
 //! ```Rust
 //! pub struct DOGM132W5;
 //! impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
