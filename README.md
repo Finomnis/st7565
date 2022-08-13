@@ -91,4 +91,4 @@ impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
 
 The exact values for the respective display have to be taken from the displays manual.
 
-If you created a specification for a new display, please open a pull request on https://github.com/Finomnis/st7565/pulls in order to make it available to the public.
+If you created a specification for a new display, please open a pull request on https://github.com/Finomnis/st7565/pulls to make it available to the public.
