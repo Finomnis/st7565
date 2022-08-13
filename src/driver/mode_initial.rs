@@ -48,6 +48,6 @@ where
     pub fn into_graphics_mode(
         self,
     ) -> ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES> {
-        self.into_mode(GraphicsMode::new())
+        self.into_mode(GraphicsMode::default())
     }
 }

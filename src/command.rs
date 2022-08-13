@@ -47,7 +47,7 @@ where
             Command::PageAddressSet { address } => Single(0b10110000 | (address & 0b00001111)),
             Command::ColumnAddressSet { address } => Double(
                 0b00010000 | ((address >> 4) & 0b00001111),
-                0b00000000 | (address & 0b00001111),
+                address & 0b00001111,
             ),
             Command::AdcSelect { reverse } => Single(0b10100000 | reverse as u8),
             Command::DisplayNormalReverse { reverse } => Single(0b10100110 | reverse as u8),

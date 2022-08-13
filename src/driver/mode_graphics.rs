@@ -17,8 +17,8 @@ pub struct GraphicsMode<const WIDTH: usize, const PAGES: usize> {
     page_buffers: [([u8; WIDTH], Option<Range<usize>>); PAGES],
 }
 
-impl<const WIDTH: usize, const PAGES: usize> GraphicsMode<WIDTH, PAGES> {
-    pub fn new() -> Self {
+impl<const WIDTH: usize, const PAGES: usize> Default for GraphicsMode<WIDTH, PAGES> {
+    fn default() -> Self {
         Self {
             // Fill with full dirty flags to force an initial synchronization
             page_buffers: [(); PAGES].map(|()| ([0; WIDTH], Some(0..WIDTH))),
