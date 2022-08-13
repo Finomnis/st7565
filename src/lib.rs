@@ -37,7 +37,7 @@
 //!
 //! // Draw on it using the embedded_graphics library
 //! Circle::new(Point::new(10, 6), 20)
-//!     .into_styled(PrimitiveStyle::with_stroke(BinaryColor::Off, 2))
+//!     .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
 //!     .draw(&mut disp)
 //!     .unwrap();
 //! disp.flush().unwrap();
