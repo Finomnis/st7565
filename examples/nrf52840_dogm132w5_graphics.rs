@@ -7,11 +7,13 @@ use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
 use embedded_graphics::{
+    geometry::Size,
+    mono_font::{ascii::FONT_8X13, MonoTextStyle},
     pixelcolor::BinaryColor,
     prelude::*,
-    primitives::{Circle, PrimitiveStyle},
+    primitives::{Circle, PrimitiveStyle, Rectangle},
+    text::Text,
 };
-use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
 use st7565::{displays::DOGM132W5, ST7565};
 
@@ -68,29 +70,21 @@ fn main() -> ! {
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
-    // Play a cute little animation
-    fn get_animation_frame(i: i32) -> (i32, u32) {
-        let pos = if i > 100 { 200 - i } else { i };
-        let size = if pos > 50 { 100 - pos } else { pos } / 3;
-        (pos, size as u32)
-    }
+    Circle::new(Point::new(6, 6), 20)
+        .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+        .draw(&mut disp)
+        .unwrap();
 
-    let mut i = 0;
-    loop {
-        timer.delay_ms(100u8);
+    Rectangle::new(Point::new(106, 6), Size::new(20, 20))
+        .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+        .draw(&mut disp)
+        .unwrap();
 
-        let (pos, size) = get_animation_frame(i);
-        Circle::new(Point::new(pos, 6), size)
-            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::Off, 2))
-            .draw(&mut disp)
-            .unwrap();
+    let font = MonoTextStyle::new(&FONT_8X13, BinaryColor::On);
+    Text::new("Hello,\nRust!", Point::new(43, 13), font)
+        .draw(&mut disp)
+        .unwrap();
 
-        i = (i + 1) % 200;
-        let (pos, size) = get_animation_frame(i);
-        Circle::new(Point::new(pos, 6), size)
-            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
-            .draw(&mut disp)
-            .unwrap();
-        disp.flush().unwrap();
-    }
+    disp.flush().unwrap();
+    loop {}
 }

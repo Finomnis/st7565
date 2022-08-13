@@ -1,6 +1,6 @@
 # `st7565`
 
-[![CRIUS display showing the Rust logo](readme_banner.jpg?raw=true)](examples/image_i2c.rs)
+[![DOGM132W-5 display showing the graphics example](readme_banner.jpg?raw=true)](examples/nrf52840_dogm132w5_graphics.rs)
 
 [![Crates.io](https://img.shields.io/crates/v/st7565)](https://crates.io/crates/st7565)
 [![Crates.io](https://img.shields.io/crates/d/st7565)](https://crates.io/crates/st7565)
