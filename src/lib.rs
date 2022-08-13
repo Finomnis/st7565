@@ -53,7 +53,7 @@
 //! send the modified data to the display.
 //!
 //!
-//! ## Adding support for a new st7565 based display
+//! ## Adding support for new st7565 based displays:
 //!
 //! The example above uses the [`DOGM132W5`](displays::DOGM132W5) struct in the [`ST7565::new()`] call.
 //!
