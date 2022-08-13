@@ -55,7 +55,7 @@ disp.flush().unwrap();
 Note the `DOGM132W5` object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
 
 Further note the `.into_graphics_mode()` call, which switches the driver from its initial
-mode to the [embedded-graphics](https://crates.io/crates/embedded-graphics) driver mode.
+mode to the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) driver mode.
 The `disp` object can then be used as a `DrawTarget` in `embedded-graphics` calls.
 
 After drawing something, a `.flush()` call has to be issued to actually
