@@ -70,21 +70,23 @@ fn main() -> ! {
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
+    // Draw content
     Circle::new(Point::new(6, 6), 20)
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
         .draw(&mut disp)
         .unwrap();
-
     Rectangle::new(Point::new(106, 6), Size::new(20, 20))
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
         .draw(&mut disp)
         .unwrap();
-
     let font = MonoTextStyle::new(&FONT_8X13, BinaryColor::On);
     Text::new("Hello,\nRust!", Point::new(43, 13), font)
         .draw(&mut disp)
         .unwrap();
 
+    // Send content to display
     disp.flush().unwrap();
+
+    // Done
     loop {}
 }
