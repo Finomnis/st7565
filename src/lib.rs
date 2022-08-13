@@ -11,7 +11,7 @@
 //! Note the `MODE_3` of the SPI. The DOGM132W-5 display expects the clock to be configured
 //! with `CPOL=1` and `CPHA=1`, which is also called `SPI Mode 3`.
 //!
-//! ```Rust
+//! ```rust
 //! // Create DOGM132W-5 spi bus
 //! let disp_spi = SPIInterface::new(
 //!     hal::Spim::new(
@@ -62,7 +62,7 @@
 //! implements the [`DisplaySpecs`] object.
 //!
 //! For example, the definition of the [`DOGM132W5`](displays::DOGM132W5) struct looks like this:
-//! ```Rust
+//! ```rust
 //! pub struct DOGM132W5;
 //! impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
 //!     const FLIP_ROWS: bool = false;
