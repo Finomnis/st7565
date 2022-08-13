@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/Finomnis/st7565"
 description = "Driver for st7565 based displays."
-keywords = ["no-std", "st7565", "lcd", "embedded", "embedded-hal-driver"]
+keywords = ["no-std", "st7565", "lcd", "embedded", "embedded-hal-driver", "embedded-graphics"]
 categories = ["embedded", "no-std"]
 
 [lib]
