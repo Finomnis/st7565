@@ -70,7 +70,7 @@ To initialize the `ST7565` driver struct with a different display, a new display
 specification has to be created. This can be done by creating an empty struct that
 implements the `DisplaySpecs` object.
 
-For example, the definition for the `DOGM132W5` struct looks like this:
+For example, the definition of the `DOGM132W5` struct looks like this:
 ```Rust
 pub struct DOGM132W5;
 impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
