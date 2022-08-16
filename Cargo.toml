@@ -10,6 +10,14 @@ description = "Driver for st7565 based displays."
 keywords = ["no-std", "st7565", "lcd", "embedded", "embedded-hal-driver"]
 categories = ["embedded", "no-std"]
 
+exclude = [
+    "/.gitignore",
+    "/.github/",
+    "/.vscode/",
+    "/TODO.txt",
+    "/UPCOMING_VERSION_CHANGES.txt",
+]
+
 [lib]
 harness = false
 
