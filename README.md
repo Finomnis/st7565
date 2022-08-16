@@ -4,9 +4,9 @@
 
 [![Crates.io](https://img.shields.io/crates/v/st7565)](https://crates.io/crates/st7565)
 [![Crates.io](https://img.shields.io/crates/d/st7565)](https://crates.io/crates/st7565)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/Finomnis/st7565/blob/main/LICENSE)
+[![License](https://img.shields.io/crates/l/st7565)](https://github.com/Finomnis/st7565/blob/main/LICENSE-MIT)
 [![Build Status](https://img.shields.io/github/workflow/status/Finomnis/st7565/CI/main)](https://github.com/Finomnis/st7565/actions/workflows/ci.yml?query=branch%3Amain)
-[![docs.rs](https://docs.rs/st7565/badge.svg)](https://docs.rs/st7565)
+[![docs.rs](https://img.shields.io/docsrs/st7565)](https://docs.rs/st7565)
 
 This crate aims to provide an
 [embedded-graphics](https://crates.io/crates/embedded-graphics)
