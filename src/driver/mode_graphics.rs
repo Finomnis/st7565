@@ -79,6 +79,10 @@ where
         I: IntoIterator<Item = Pixel<Self::Color>>,
     {
         for Pixel(Point { x, y }, color) in pixels.into_iter() {
+            if x < 0 || y < 0 || x as usize >= WIDTH || y as usize >= HEIGHT {
+                continue;
+            }
+
             let x = x as usize;
             let page = (y / 8) as usize;
             let y_offset = (y % 8) as u8;
