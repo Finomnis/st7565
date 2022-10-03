@@ -80,7 +80,7 @@
 //! }
 //! ```
 //!
-//! The exact values for the respective display have to be taken from the displays manual.
+//! The exact values for the respective display have to be taken from the display's manual.
 //!
 //! If you created a specification for a new display, please open a pull request on <https://github.com/Finomnis/st7565/pulls> to make it available to the public.
 //!
