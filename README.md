@@ -14,7 +14,7 @@ compatible driver for displays based on the st7565 chipset.
 
 ## Example
 
-The following code is intended for the [DOGM132W-5](https://www.displayvisions.us/products/dog.html) display connected to an [nRF52840](https://www.nordicsemi.com/products/nrf52840)
+The following example is intended for the [DOGM132W-5](https://www.displayvisions.us/products/dog.html) display connected to an [nRF52840](https://www.nordicsemi.com/products/nrf52840)
 microcontroller.
 
 Note the `MODE_3` of the SPI. The DOGM132W-5 display expects the clock to be configured
