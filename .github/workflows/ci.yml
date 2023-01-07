@@ -33,6 +33,23 @@ jobs:
       - name: Build
         run: cross build --release --target=${{ matrix.target }}
 
+  build_examples:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabihf
+
+      - name: Build
+        run: cargo build --examples --release
+
   lints:
     name: Lints
     runs-on: ubuntu-latest
@@ -62,7 +79,6 @@ jobs:
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
           targets: thumbv7em-none-eabihf
 
       - name: Run cargo doc
@@ -83,7 +99,6 @@ jobs:
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
           targets: thumbv7em-none-eabihf
 
       - name: Query crate version
