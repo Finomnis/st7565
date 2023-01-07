@@ -13,6 +13,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
     strategy:
       matrix:
         target:
@@ -23,67 +25,50 @@ jobs:
           - thumbv6m-none-eabi
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      #- uses: Swatinem/rust-cache@v1
+      - name: Install cross
+        uses: taiki-e/install-action@cross
 
-      - name: Run cargo build
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }}
+      - name: Build
+        run: cross build --release --target=${{ matrix.target }}
 
   lints:
     name: Lints
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
           components: clippy
-          target: thumbv7em-none-eabihf
+          targets: thumbv7em-none-eabihf
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+        run: cargo fmt --all -- --check
 
       - name: Run cargo clippy
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features -- -D warnings
+        run: cargo clippy --all-features -- -D warnings
 
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          target: thumbv7em-none-eabihf
+          components: clippy
+          targets: thumbv7em-none-eabihf
 
       - name: Run cargo doc
         env:
           RUSTDOCFLAGS: "-Dwarnings"
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --no-deps
+        run: cargo doc --no-deps
 
   release:
     name: Publish version
@@ -93,16 +78,13 @@ jobs:
     needs: [build, lints, docs]
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
           components: clippy
-          target: thumbv7em-none-eabihf
+          targets: thumbv7em-none-eabihf
 
       - name: Query crate version
         run: echo "crate_version=$(cargo metadata --format-version=1 --no-deps | python -c "import sys,json; print('v' + json.load(sys.stdin)['packages'][0]['version'])")" >> $GITHUB_ENV
@@ -120,12 +102,7 @@ jobs:
         run: test ${{ env.crate_version }} = ${{ env.release_tag_version }}
 
       - name: Cargo login
-        uses: actions-rs/cargo@v1
-        with:
-          command: login
-          args: ${{ secrets.CRATES_IO_TOKEN }}
+        run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
       - name: Cargo publish
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
+        run: cargo publish
