@@ -31,7 +31,7 @@ jobs:
         uses: taiki-e/install-action@cross
 
       - name: Build
-        run: cross build --release --target=${{ matrix.target }}
+        run: cross build --bins --examples --release --target=${{ matrix.target }}
 
   lints:
     name: Lints
