@@ -5,7 +5,7 @@
 [![Crates.io](https://img.shields.io/crates/v/st7565)](https://crates.io/crates/st7565)
 [![Crates.io](https://img.shields.io/crates/d/st7565)](https://crates.io/crates/st7565)
 [![License](https://img.shields.io/crates/l/st7565)](https://github.com/Finomnis/st7565/blob/main/LICENSE-MIT)
-[![Build Status](https://img.shields.io/github/workflow/status/Finomnis/st7565/CI/main)](https://github.com/Finomnis/st7565/actions/workflows/ci.yml?query=branch%3Amain)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Finomnis/st7565/ci.yml)](https://github.com/Finomnis/st7565/actions/workflows/ci.yml?query=branch%3Amain)
 [![docs.rs](https://img.shields.io/docsrs/st7565)](https://docs.rs/st7565)
 
 This crate aims to provide an
