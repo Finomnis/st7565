@@ -27,7 +27,7 @@ pub struct GMG12864;
 impl DisplaySpecs<132, 64, 8> for GMG12864 {
     const FLIP_ROWS: bool = true;
     const FLIP_COLUMNS: bool = false;
-    const INVERTED: bool = true;
+    const INVERTED: bool = false;
     const BIAS_MODE_1: bool = false;
     const POWER_CONTROL: PowerControlMode = PowerControlMode {
         booster_circuit: true,
