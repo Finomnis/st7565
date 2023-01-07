@@ -35,6 +35,6 @@ impl DisplaySpecs<132, 64, 8> for GMG12864 {
         voltage_follower_circuit: true,
     };
     const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8 = 0b111;
-    const ELECTRONIC_VOLUME: u8 =  0b010001;
+    const ELECTRONIC_VOLUME: u8 = 0b010001;
     const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
 }
