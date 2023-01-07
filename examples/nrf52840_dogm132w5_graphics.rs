@@ -52,7 +52,7 @@ fn main() -> ! {
         hal::Spim::new(
             peripherals.SPIM0,
             hal::spim::Pins {
-                sck: disp_scl,
+                sck: Some(disp_scl),
                 mosi: Some(disp_si),
                 miso: None,
             },
