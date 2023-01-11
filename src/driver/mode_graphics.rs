@@ -59,15 +59,56 @@ impl<
 
         Ok(())
     }
+
+    /// Release the display interface object
+    ///
+    /// This is meant for situations where the display interface is shared between several devices.
+    ///
+    /// All functions that perform communication with the display are
+    /// unavailable until the display interface is attached again.
+    pub fn release_display_interface(
+        self,
+    ) -> (
+        DI,
+        ST7565<(), SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>,
+    ) {
+        (
+            self.interface,
+            ST7565 {
+                interface: (),
+                display_specs: self.display_specs,
+                mode: self.mode,
+            },
+        )
+    }
 }
 
-impl<
-        DI: WriteOnlyDataCommand,
-        SPECS,
-        const WIDTH: usize,
-        const HEIGHT: usize,
-        const PAGES: usize,
-    > DrawTarget for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+/// ---- Functionality of the detached graphics mode ----
+/// =====================================================
+///
+/// In this mode, the driver can be still used as a [DrawTarget] for the [embedded_graphics](embedded_graphics_core) crate,
+/// but no display communication can happen until the display interface is attached again.
+///
+/// This makes it possible to share the SPI bus with multiple devices.
+///
+impl<SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
+    ST7565<(), SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+{
+    /// Attach the display interface back to the driver
+    pub fn attach_display_interface<DI: WriteOnlyDataCommand>(
+        self,
+        interface: DI,
+    ) -> ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES> {
+        ST7565 {
+            interface,
+            display_specs: self.display_specs,
+            mode: self.mode,
+        }
+    }
+}
+
+impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> DrawTarget
+    for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
 where
     SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
@@ -112,13 +153,8 @@ where
     }
 }
 
-impl<
-        DI: WriteOnlyDataCommand,
-        SPECS,
-        const WIDTH: usize,
-        const HEIGHT: usize,
-        const PAGES: usize,
-    > OriginDimensions for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
+impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize> OriginDimensions
+    for ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>
 where
     SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
 {
