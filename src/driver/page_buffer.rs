@@ -1,36 +1,3 @@
-/* Might become relevant at some point
-
-use crate::DisplaySpecs;
-
-const fn size_width<
-    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
-    const WIDTH: usize,
-    const HEIGHT: usize,
-    const PAGES: usize,
->(
-    _: &SPECS,
-) -> usize {
-    WIDTH
-}
-const fn size_pages<
-    SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
-    const WIDTH: usize,
-    const HEIGHT: usize,
-    const PAGES: usize,
->(
-    _: &SPECS,
-) -> usize {
-    PAGES
-}
-
-macro_rules! define_graphics_page_buffer {
-    ($name:ident, $specs:expr) => {
-        static $name: GraphicsPageBuffer<{ size_width(&$specs) }, { size_pages(&$specs) }> =
-            GraphicsPageBuffer::new();
-    };
-}
-*/
-
 /// A graphics page buffer, required for graphics mode.
 ///
 /// Needs to be provided by the user.
