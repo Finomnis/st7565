@@ -15,7 +15,7 @@ use embedded_graphics::{
     text::Text,
 };
 use hal::gpio::Level;
-use st7565::{displays::DOGM132W5, ST7565};
+use st7565::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -65,7 +65,8 @@ fn main() -> ! {
     );
 
     // Create DOGM132W-5 display driver
-    let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode();
+    let mut page_buffer = GraphicsPageBuffer::new();
+    let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode(&mut page_buffer);
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
