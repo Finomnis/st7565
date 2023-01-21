@@ -39,17 +39,17 @@ impl<
     ///
     /// Needs to be called after drawing to actually display the data on screen.
     pub fn flush(&mut self) -> Result<(), DisplayError> {
-        for (page, (buffer, dirty)) in self.mode.page_buffers.0.iter_mut().enumerate() {
-            let page = page as u8;
+        for (address, page) in self.mode.page_buffers.pages.iter_mut().enumerate() {
+            let address = address as u8;
 
-            if let Some((start, end)) = dirty.take() {
+            if let Some((start, end)) = page.dirty.take() {
                 if start < end && start < WIDTH {
                     self.interface
-                        .send_command(Command::PageAddressSet { address: page })?;
+                        .send_command(Command::PageAddressSet { address })?;
                     self.interface.send_command(Command::ColumnAddressSet {
                         address: start as u8,
                     })?;
-                    self.interface.send_data(U8(&buffer[start..end]))?;
+                    self.interface.send_data(U8(&page.data[start..end]))?;
                 }
             }
         }
@@ -125,20 +125,20 @@ where
             let page = (y / 8) as usize;
             let y_offset = (y % 8) as u8;
 
-            if let Some((buffer, dirty)) = self.mode.page_buffers.0.get_mut(page) {
-                if let Some(buffer_line) = buffer.get_mut(x) {
+            if let Some(page) = self.mode.page_buffers.pages.get_mut(page) {
+                if let Some(buffer_line) = page.data.get_mut(x) {
                     let updated = match color {
                         BinaryColor::On => *buffer_line | (1u8 << y_offset),
                         BinaryColor::Off => *buffer_line & (!(1u8 << y_offset)),
                     };
 
                     if updated != *buffer_line {
-                        match dirty {
+                        match &mut page.dirty {
                             Some(dirty_range) => {
                                 dirty_range.0 = dirty_range.0.min(x);
                                 dirty_range.1 = dirty_range.1.max(x + 1);
                             }
-                            None => *dirty = Some((x, x + 1)),
+                            None => page.dirty = Some((x, x + 1)),
                         };
                         *buffer_line = updated;
                     }
