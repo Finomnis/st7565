@@ -66,7 +66,7 @@ fn main() -> ! {
     disp.set_page(2).unwrap();
     disp.set_column(10).unwrap();
     let mut data = [0u8; 100];
-    for (pos, val) in (&mut data).iter_mut().enumerate() {
+    for (pos, val) in data.iter_mut().enumerate() {
         *val = pos as u8;
     }
     disp.write_pixel_data(&data).unwrap();

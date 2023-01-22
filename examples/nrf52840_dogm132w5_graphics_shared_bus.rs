@@ -74,7 +74,7 @@ fn main() -> ! {
     // Release the SPI bus.
     // The SPI bus can now be used for communication with other devicesuntil we desire to call `flush()`,
     // where we have to attach it again.
-    let (spi, mut disp) = disp.release_display_interface();
+    let (mut disp, spi) = disp.release_display_interface();
 
     // Draw content
     Circle::new(Point::new(6, 6), 20)
@@ -95,5 +95,7 @@ fn main() -> ! {
     disp.flush().unwrap();
 
     // Done
-    loop {}
+    loop {
+        cortex_m::asm::wfi();
+    }
 }

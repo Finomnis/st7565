@@ -89,5 +89,7 @@ fn main() -> ! {
     disp.flush().unwrap();
 
     // Done
-    loop {}
+    loop {
+        cortex_m::asm::wfi();
+    }
 }

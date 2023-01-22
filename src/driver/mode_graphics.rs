@@ -66,16 +66,16 @@ impl<
     pub fn release_display_interface(
         self,
     ) -> (
-        DI,
         ST7565<(), SPECS, GraphicsMode<'a, WIDTH, PAGES>, WIDTH, HEIGHT, PAGES>,
+        DI,
     ) {
         (
-            self.interface,
             ST7565 {
                 interface: (),
                 display_specs: self.display_specs,
                 mode: self.mode,
             },
+            self.interface,
         )
     }
 }
