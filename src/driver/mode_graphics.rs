@@ -63,6 +63,10 @@ impl<
     ///
     /// All functions that perform communication with the display are
     /// unavailable until the display interface is attached again.
+    ///
+    /// Note that the bus attached later does not need to be the same bus as returned by this function,
+    /// so the returned SPI bus object may be ignored (for example if the display interface object
+    /// is based on references instead of ownership).
     pub fn release_display_interface(
         self,
     ) -> (
