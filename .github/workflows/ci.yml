@@ -31,7 +31,7 @@ jobs:
         uses: taiki-e/install-action@cross
 
       - name: Build
-        run: cross build --release --target=${{ matrix.target }}
+        run: cross build --all-features --release --target=${{ matrix.target }}
 
   build_examples:
     name: Build
@@ -48,7 +48,7 @@ jobs:
           targets: thumbv7em-none-eabihf
 
       - name: Build
-        run: cargo build --examples --release
+        run: cargo build --all-features --all-targets --release
 
   lints:
     name: Lints

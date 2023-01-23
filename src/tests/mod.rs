@@ -1,12 +1,20 @@
+#[cfg(target_arch = "arm")]
 use defmt_rtt as _; // global logger
+#[cfg(target_arch = "arm")]
+use defmt_test::tests;
+#[cfg(target_arch = "arm")]
 use nrf52840_hal as _; // memory layout
+#[cfg(target_arch = "arm")]
 use panic_probe as _;
+
+#[cfg(target_arch = "x86_64")]
+extern crate std;
 
 mod display_mock;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-//#[cfg(test)]
+#[cfg(target_arch = "arm")]
 #[defmt::panic_handler]
 fn panic() -> ! {
     cortex_m::asm::udf()
@@ -15,7 +23,7 @@ fn panic() -> ! {
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
 // once within a crate. the module can be in any file but there can only be at most
 // one `#[tests]` module in this library crate
-#[defmt_test::tests]
+#[tests]
 mod unit_tests {
     use super::display_mock::DisplayMock;
 
