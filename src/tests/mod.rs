@@ -1,29 +1,30 @@
 #[cfg(all(target_arch = "arm", target_os = "none"))]
-use defmt_rtt as _; // global logger
-#[cfg(all(target_arch = "arm", target_os = "none"))]
-use defmt_test::tests;
-#[cfg(all(target_arch = "arm", target_os = "none"))]
-use nrf52840_hal as _; // memory layout
-#[cfg(all(target_arch = "arm", target_os = "none"))]
-use panic_probe as _;
+mod arch_dependent {
+    use defmt_rtt as _; // global logger
+    use nrf52840_hal as _; // memory layout
+    use panic_probe as _;
+
+    pub use defmt_test::tests;
+
+    // same panicking *behavior* as `panic-probe` but doesn't print a panic message
+    // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
+    #[defmt::panic_handler]
+    fn panic() -> ! {
+        cortex_m::asm::udf()
+    }
+}
 
 #[cfg(not(all(target_arch = "arm", target_os = "none")))]
-extern crate std;
+mod arch_dependent {
+    extern crate std;
+}
 
 mod display_mock;
-
-// same panicking *behavior* as `panic-probe` but doesn't print a panic message
-// this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-#[cfg(all(target_arch = "arm", target_os = "none"))]
-#[defmt::panic_handler]
-fn panic() -> ! {
-    cortex_m::asm::udf()
-}
 
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
 // once within a crate. the module can be in any file but there can only be at most
 // one `#[tests]` module in this library crate
-#[tests]
+#[arch_dependent::tests]
 mod unit_tests {
     use super::display_mock::DisplayMock;
 
