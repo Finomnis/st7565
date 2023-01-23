@@ -1,20 +1,20 @@
-#[cfg(target_arch = "arm")]
+#[cfg(all(target_arch = "arm", target_os = "none"))]
 use defmt_rtt as _; // global logger
-#[cfg(target_arch = "arm")]
+#[cfg(all(target_arch = "arm", target_os = "none"))]
 use defmt_test::tests;
-#[cfg(target_arch = "arm")]
+#[cfg(all(target_arch = "arm", target_os = "none"))]
 use nrf52840_hal as _; // memory layout
-#[cfg(target_arch = "arm")]
+#[cfg(all(target_arch = "arm", target_os = "none"))]
 use panic_probe as _;
 
-#[cfg(target_arch = "x86_64")]
+#[cfg(not(all(target_arch = "arm", target_os = "none")))]
 extern crate std;
 
 mod display_mock;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-#[cfg(target_arch = "arm")]
+#[cfg(all(target_arch = "arm", target_os = "none"))]
 #[defmt::panic_handler]
 fn panic() -> ! {
     cortex_m::asm::udf()
