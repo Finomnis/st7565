@@ -17,7 +17,9 @@ fn panic() -> ! {
 // one `#[tests]` module in this library crate
 #[defmt_test::tests]
 mod unit_tests {
-    use super::display_mock::DisplayMock;
+    use crate::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
+
+    use super::display_mock::{DisplayMock, ExpectedAction::*};
 
     #[test]
     fn commands() {
@@ -29,7 +31,8 @@ mod unit_tests {
             types::{BoosterRatio, PowerControlMode, StaticIndicatorMode},
         };
         fn check_command(cmd: Command, result: &[u8]) {
-            DisplayMock::expect_command(result)
+            DisplayMock::new()
+                .expect(&[Command(result)])
                 .send_command(cmd)
                 .unwrap();
         }
@@ -197,5 +200,45 @@ mod unit_tests {
             &[0b11111000, 0b00000011],
         );
         //check_command(NOP, &[0b11100011]);
+    }
+
+    #[test]
+    fn graphics_mode() {
+        use embedded_graphics::{
+            geometry::Size,
+            pixelcolor::BinaryColor,
+            prelude::*,
+            primitives::{Circle, PrimitiveStyle, Rectangle},
+        };
+
+        let empty_line = [0u8; 132];
+        let empty_image = [Data(empty_line.as_slice()); 4];
+        let disp_mock = DisplayMock::new().expect(&empty_image);
+
+        let mut buffer = GraphicsPageBuffer::new();
+        let mut disp = ST7565::new(disp_mock, DOGM132W5).into_graphics_mode(&mut buffer);
+
+        // Full flush
+        disp.flush().unwrap();
+        let (mut disp, _) = disp.release_display_interface();
+
+        // Draw rectangle
+        Rectangle::new(Point::new(106, 6), Size::new(20, 20))
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .draw(&mut disp)
+            .unwrap();
+        let disp_mock = DisplayMock::new().expect(&[]);
+        let mut disp = disp.attach_display_interface(disp_mock);
+        disp.flush().unwrap();
+        let (mut disp, _) = disp.release_display_interface();
+
+        // Draw circle
+        Circle::new(Point::new(6, 10), 10)
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .draw(&mut disp)
+            .unwrap();
+        let disp_mock = DisplayMock::new().expect(&[]);
+        let mut disp = disp.attach_display_interface(disp_mock);
+        disp.flush().unwrap();
     }
 }

@@ -1,59 +1,82 @@
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 
-pub struct DisplayMock {}
-pub struct DisplayMockExpectation<'a> {
-    cmd: Option<&'a [u8]>,
-    data: Option<&'a [u8]>,
+#[derive(Copy, Clone, PartialEq, Eq, Debug, defmt::Format)]
+pub enum ExpectedAction<'a> {
+    Command(&'a [u8]),
+    Data(&'a [u8]),
+}
+use ExpectedAction::*;
+
+pub struct DisplayMock<'a, 'b> {
+    expected_actions: &'a [ExpectedAction<'b>],
 }
 
-impl DisplayMock {
-    pub fn expect_command(data: &[u8]) -> DisplayMockExpectation<'_> {
-        DisplayMockExpectation {
-            cmd: Some(data),
-            data: None,
+impl DisplayMock<'_, '_> {
+    pub fn new() -> Self {
+        Self {
+            expected_actions: &[],
         }
     }
-    // pub fn expect_data(data: &[u8]) -> DisplayMockExpectation<'_> {
-    //     DisplayMockExpectation {
-    //         cmd: None,
-    //         data: Some(data),
-    //     }
-    // }
+    pub fn expect<'a, 'b>(mut self, expected: &'a [ExpectedAction<'b>]) -> DisplayMock<'a, 'b> {
+        assert!(
+            self.expected_actions.is_empty(),
+            "Previous expected actions did not happen yet!"
+        );
+        DisplayMock {
+            expected_actions: expected,
+        }
+    }
 }
 
-impl WriteOnlyDataCommand for DisplayMockExpectation<'_> {
+impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
     fn send_commands(
         &mut self,
         data: display_interface::DataFormat<'_>,
     ) -> Result<(), DisplayError> {
-        let expected = self.cmd.take().expect("No command sending was expected!");
-
-        if let U8(actual) = data {
-            defmt::assert_eq!(actual, expected, "Unexpected command data received!");
+        let actual = if let U8(actual) = data {
+            Command(actual)
         } else {
             defmt::panic!("Only U8 data supported for now!")
-        }
+        };
+
+        let (expected, leftover) = self
+            .expected_actions
+            .split_first()
+            .expect("No action was expected!");
+
+        self.expected_actions = leftover;
+
+        defmt::assert_eq!(&actual, expected, "Unexpected action received!");
+
         Ok(())
     }
     fn send_data(&mut self, data: display_interface::DataFormat<'_>) -> Result<(), DisplayError> {
-        let expected = self.data.take().expect("No command sending was expected!");
-
-        if let U8(actual) = data {
-            defmt::assert_eq!(actual, expected, "Unexpected command data received!");
+        let actual = if let U8(actual) = data {
+            Data(actual)
         } else {
             defmt::panic!("Only U8 data supported for now!")
-        }
+        };
+
+        let (expected, leftover) = self
+            .expected_actions
+            .split_first()
+            .expect("No action was expected!");
+
+        self.expected_actions = leftover;
+
+        defmt::assert_eq!(&actual, expected, "Unexpected data received!");
+
         Ok(())
     }
 }
 
-impl Drop for DisplayMockExpectation<'_> {
+impl Drop for DisplayMock<'_, '_> {
     fn drop(&mut self) {
-        if let Some(data) = self.cmd.take() {
-            defmt::panic!("Command was expected, but not provided: {:?}", data);
-        }
-        if let Some(data) = self.data.take() {
-            defmt::panic!("Data was expected, but not provided: {:?}", data);
+        if !self.expected_actions.is_empty() {
+            defmt::panic!(
+                "Actions were expected, but did not happen: {:?}",
+                self.expected_actions
+            );
         }
     }
 }
