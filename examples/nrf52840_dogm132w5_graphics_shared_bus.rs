@@ -72,8 +72,8 @@ fn main() -> ! {
     disp.set_display_on(true).unwrap();
 
     // Release the SPI bus.
-    // The SPI bus can now be used for communication with other devicesuntil we desire to call `flush()`,
-    // where we have to attach it again.
+    // The SPI bus can now be used for communication with other devices
+    // until we desire to call `flush()`, where we have to attach it again.
     let (mut disp, spi) = disp.release_display_interface();
 
     // Draw content
