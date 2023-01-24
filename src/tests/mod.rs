@@ -1,23 +1,14 @@
-use defmt_rtt as _; // global logger
-use nrf52840_hal as _; // memory layout
-use panic_probe as _;
-
+mod arch_dependent;
 mod display_mock;
-
-// same panicking *behavior* as `panic-probe` but doesn't print a panic message
-// this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-//#[cfg(test)]
-#[defmt::panic_handler]
-fn panic() -> ! {
-    cortex_m::asm::udf()
-}
 
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
 // once within a crate. the module can be in any file but there can only be at most
 // one `#[tests]` module in this library crate
-#[defmt_test::tests]
+#[arch_dependent::tests]
 mod unit_tests {
-    use super::display_mock::DisplayMock;
+    use crate::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
+
+    use super::display_mock::{DisplayMock, ExpectedAction::*};
 
     #[test]
     fn commands() {
@@ -29,9 +20,9 @@ mod unit_tests {
             types::{BoosterRatio, PowerControlMode, StaticIndicatorMode},
         };
         fn check_command(cmd: Command, result: &[u8]) {
-            DisplayMock::expect_command(result)
-                .send_command(cmd)
-                .unwrap();
+            DisplayMock::with_expect(&[Command(result)], |mut disp| {
+                disp.send_command(cmd).unwrap()
+            });
         }
 
         check_command(DisplayOnOff { on: true }, &[0b10101111]);
@@ -197,5 +188,47 @@ mod unit_tests {
             &[0b11111000, 0b00000011],
         );
         //check_command(NOP, &[0b11100011]);
+    }
+
+    #[test]
+    fn graphics_mode() {
+        use embedded_graphics::{
+            geometry::Size,
+            pixelcolor::BinaryColor,
+            prelude::*,
+            primitives::{Circle, PrimitiveStyle, Rectangle},
+        };
+
+        let empty_line = [0u8; 132];
+        let empty_image = [Data(empty_line.as_slice()); 4];
+        let mut buffer = GraphicsPageBuffer::new();
+        let mut disp = DisplayMock::with_expect(&empty_image, |disp_mock| {
+            let mut disp = ST7565::new(disp_mock, DOGM132W5).into_graphics_mode(&mut buffer);
+
+            // Full flush
+            disp.flush().unwrap();
+            disp.release_display_interface().0
+        });
+
+        // Draw rectangle
+        Rectangle::new(Point::new(106, 6), Size::new(20, 20))
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .draw(&mut disp)
+            .unwrap();
+        let mut disp = DisplayMock::with_expect(&[], |disp_mock| {
+            let mut disp = disp.attach_display_interface(disp_mock);
+            disp.flush().unwrap();
+            disp.release_display_interface().0
+        });
+
+        // Draw circle
+        Circle::new(Point::new(6, 10), 10)
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .draw(&mut disp)
+            .unwrap();
+        DisplayMock::with_expect(&[], |disp_mock| {
+            let mut disp = disp.attach_display_interface(disp_mock);
+            disp.flush().unwrap();
+        });
     }
 }
