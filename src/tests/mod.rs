@@ -1,24 +1,4 @@
-#[cfg(all(target_arch = "arm", target_os = "none"))]
-mod arch_dependent {
-    use defmt_rtt as _; // global logger
-    use nrf52840_hal as _; // memory layout
-    use panic_probe as _;
-
-    pub use defmt_test::tests;
-
-    // same panicking *behavior* as `panic-probe` but doesn't print a panic message
-    // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-    #[defmt::panic_handler]
-    fn panic() -> ! {
-        cortex_m::asm::udf()
-    }
-}
-
-#[cfg(not(all(target_arch = "arm", target_os = "none")))]
-mod arch_dependent {
-    extern crate std;
-}
-
+mod arch_dependent;
 mod display_mock;
 
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
