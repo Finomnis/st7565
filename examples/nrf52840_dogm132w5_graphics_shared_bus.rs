@@ -71,6 +71,11 @@ fn main() -> ! {
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
 
+    // Release the SPI bus.
+    // The SPI bus can now be used for communication with other devices
+    // until we desire to call `flush()`, where we have to attach it again.
+    let (mut disp, spi) = disp.release_display_interface();
+
     // Draw content
     Circle::new(Point::new(6, 6), 20)
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
@@ -86,6 +91,7 @@ fn main() -> ! {
         .unwrap();
 
     // Send content to display
+    let mut disp = disp.attach_display_interface(spi);
     disp.flush().unwrap();
 
     // Done

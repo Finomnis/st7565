@@ -1,6 +1,6 @@
 # `st7565`
 
-[![DOGM132W-5 display showing the graphics example](readme_banner.jpg?raw=true)](examples/nrf52840_dogm132w5_graphics.rs)
+[![DOGM132W-5 display showing the graphics example](https://github.com/Finomnis/st7565/blob/main/readme_banner.jpg?raw=true)](examples/nrf52840_dogm132w5_graphics.rs)
 
 [![Crates.io](https://img.shields.io/crates/v/st7565)](https://crates.io/crates/st7565)
 [![Crates.io](https://img.shields.io/crates/d/st7565)](https://crates.io/crates/st7565)
@@ -39,7 +39,8 @@ let disp_spi = SPIInterface::new(
 );
 
 // Create DOGM132W-5 display driver
-let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode();
+let mut page_buffer = GraphicsPageBuffer::new();
+let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode(&mut page_buffer);
 disp.reset(&mut disp_rst, &mut timer).unwrap();
 disp.flush().unwrap();
 disp.set_display_on(true).unwrap();
@@ -52,25 +53,25 @@ Circle::new(Point::new(10, 6), 20)
 disp.flush().unwrap();
 ```
 
-Note the `DOGM132W5` object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
+Note the [`DOGM132W5`](displays::DOGM132W5) object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
 
-Further note the `.into_graphics_mode()` call, which switches the driver from its initial
+Further note the [`into_graphics_mode()`](ST7565::into_graphics_mode()) call, which switches the driver from its initial
 mode to the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) driver mode.
 The `disp` object can then be used as a `DrawTarget` in `embedded-graphics` calls.
 
-After drawing something, a `.flush()` call has to be issued to actually
+After drawing something, a [`flush()`](ST7565::flush()) call has to be issued to actually
 send the modified data to the display.
 
 
 ## Adding support for new st7565 based displays
 
-The example above uses the `DOGM132W5` struct in the `ST7565::new()` call.
+The example above uses the [`DOGM132W5`](displays::DOGM132W5) struct in the [`ST7565::new()`] call.
 
 To initialize the `ST7565` driver struct with a different display, a new display
 specification has to be created. This can be done by creating an empty struct that
-implements the `DisplaySpecs` object.
+implements the [`DisplaySpecs`] trait.
 
-For example, the definition of the `DOGM132W5` struct looks like this:
+For example, the definition of the [`DOGM132W5`](displays::DOGM132W5) struct looks like this:
 ```rust
 pub struct DOGM132W5;
 impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
@@ -91,4 +92,4 @@ impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
 
 The exact values for the respective display have to be taken from the display's manual.
 
-If you created a specification for a new display, please open a pull request on https://github.com/Finomnis/st7565/pulls to make it available to the public.
+If you created a specification for a new display, please open a pull request on <https://github.com/Finomnis/st7565/pulls> to make it available to the public.

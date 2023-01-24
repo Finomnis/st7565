@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use display_interface::WriteOnlyDataCommand;
 
 use super::{mode_graphics::GraphicsMode, mode_raw::RawMode};
-use crate::{DisplaySpecs, ST7565};
+use crate::{DisplaySpecs, GraphicsPageBuffer, ST7565};
 
 pub struct InitialMode;
 
@@ -47,7 +47,8 @@ where
     /// Graphics mode enables the driver to be used as a [DrawTarget](embedded_graphics_core::draw_target::DrawTarget) for the [embedded_graphics](embedded_graphics_core) crate.
     pub fn into_graphics_mode(
         self,
-    ) -> ST7565<DI, SPECS, GraphicsMode<WIDTH, PAGES>, WIDTH, HEIGHT, PAGES> {
-        self.into_mode(GraphicsMode::default())
+        buffer: &mut GraphicsPageBuffer<WIDTH, PAGES>,
+    ) -> ST7565<DI, SPECS, GraphicsMode<'_, WIDTH, PAGES>, WIDTH, HEIGHT, PAGES> {
+        self.into_mode(GraphicsMode::new(buffer))
     }
 }
