@@ -5,6 +5,7 @@ use defmt_rtt as _; // global logger
 use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
+use display_interface::WriteOnlyDataCommand;
 use display_interface_spi::SPIInterface;
 use embedded_graphics::{
     geometry::Size,
@@ -14,6 +15,7 @@ use embedded_graphics::{
     primitives::{Circle, PrimitiveStyle, Rectangle},
     text::Text,
 };
+use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use hal::gpio::Level;
 use st7565::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
 
@@ -28,6 +30,64 @@ fn panic() -> ! {
 pub fn exit() -> ! {
     loop {
         cortex_m::asm::bkpt();
+    }
+}
+
+// Newtype wrappers for bus sharing
+struct BorrowedSPIBus<'a, T>(&'a mut T);
+impl<'a, T> spi::Write<u8> for BorrowedSPIBus<'a, T>
+where
+    T: spi::Write<u8>,
+{
+    type Error = T::Error;
+
+    fn write(&mut self, words: &[u8]) -> Result<(), Self::Error> {
+        self.0.write(words)
+    }
+}
+
+struct BorrowedOutputPin<'a, T>(&'a mut T);
+impl<'a, T> OutputPin for BorrowedOutputPin<'a, T>
+where
+    T: OutputPin,
+{
+    type Error = T::Error;
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.0.set_low()
+    }
+
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.0.set_high()
+    }
+}
+
+struct SPIBusManager<SPI, DispDC, DispCS> {
+    spi_bus: SPI,
+    display_dc: DispDC,
+    display_cs: DispCS,
+}
+
+impl<SPI, DispDC, DispCS> SPIBusManager<SPI, DispDC, DispCS>
+where
+    SPI: spi::Write<u8>,
+    DispDC: OutputPin,
+    DispCS: OutputPin,
+{
+    pub fn new(spi_bus: SPI, display_dc: DispDC, display_cs: DispCS) -> Self {
+        Self {
+            spi_bus,
+            display_dc,
+            display_cs,
+        }
+    }
+
+    pub fn get_display_bus(&mut self) -> impl WriteOnlyDataCommand + '_ {
+        SPIInterface::new(
+            BorrowedSPIBus(&mut self.spi_bus),
+            BorrowedOutputPin(&mut self.display_dc),
+            BorrowedOutputPin(&mut self.display_cs),
+        )
     }
 }
 
@@ -47,8 +107,8 @@ fn main() -> ! {
     let disp_scl = port0.p0_21.into_push_pull_output(Level::High).degrade();
     let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
 
-    // Create DOGM132W-5 spi bus
-    let disp_spi = SPIInterface::new(
+    // Create SPI Manager
+    let mut spi_manager = SPIBusManager::new(
         hal::Spim::new(
             peripherals.SPIM0,
             hal::spim::Pins {
@@ -64,6 +124,9 @@ fn main() -> ! {
         disp_cs,
     );
 
+    // Create DOGM132W-5 spi bus
+    let disp_spi = spi_manager.get_display_bus();
+
     // Create DOGM132W-5 display driver
     let mut page_buffer = GraphicsPageBuffer::new();
     let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode(&mut page_buffer);
@@ -74,7 +137,7 @@ fn main() -> ! {
     // Release the SPI bus.
     // The SPI bus can now be used for communication with other devices
     // until we desire to call `flush()`, where we have to attach it again.
-    let (mut disp, spi) = disp.release_display_interface();
+    let mut disp = disp.release_display_interface().0;
 
     // Draw content
     Circle::new(Point::new(6, 6), 20)
@@ -91,7 +154,7 @@ fn main() -> ! {
         .unwrap();
 
     // Send content to display
-    let mut disp = disp.attach_display_interface(spi);
+    let mut disp = disp.attach_display_interface(spi_manager.get_display_bus());
     disp.flush().unwrap();
 
     // Done
