@@ -39,6 +39,22 @@ struct SPIBusManager {
     display_cs: Pin<Output<PushPull>>,
 }
 
+impl SPIBusManager {
+    pub fn new(
+        spi_bus: hal::Spim<hal::pac::SPIM0>,
+        display_dc: Pin<Output<PushPull>>,
+        display_cs: Pin<Output<PushPull>>,
+    ) -> Self {
+        Self {
+            spi_bus,
+            display_dc,
+            display_cs,
+        }
+    }
+
+    pub fn get_display_bus(&mut self) -> BorrowedSPIInterface {}
+}
+
 #[cortex_m_rt::entry]
 fn main() -> ! {
     let peripherals = hal::pac::Peripherals::take().unwrap();
