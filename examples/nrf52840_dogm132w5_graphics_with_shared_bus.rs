@@ -1,10 +1,12 @@
 #![no_main]
 #![no_std]
 
-use defmt_rtt as _; // global logger
+use defmt_rtt as _;
+// global logger
 use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
+use display_interface::WriteOnlyDataCommand;
 use display_interface_spi::SPIInterface;
 use embedded_graphics::{
     geometry::Size,
@@ -14,7 +16,7 @@ use embedded_graphics::{
     primitives::{Circle, PrimitiveStyle, Rectangle},
     text::Text,
 };
-use hal::gpio::Level;
+use hal::gpio::{Level, Output, Pin, PushPull};
 use st7565::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
@@ -29,6 +31,12 @@ pub fn exit() -> ! {
     loop {
         cortex_m::asm::bkpt();
     }
+}
+
+struct SPIBusManager {
+    spi_bus: hal::Spim<hal::pac::SPIM0>,
+    display_dc: Pin<Output<PushPull>>,
+    display_cs: Pin<Output<PushPull>>,
 }
 
 #[cortex_m_rt::entry]
