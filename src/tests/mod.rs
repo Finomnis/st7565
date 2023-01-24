@@ -1,21 +1,10 @@
-use defmt_rtt as _; // global logger
-use nrf52840_hal as _; // memory layout
-use panic_probe as _;
-
+mod arch_dependent;
 mod display_mock;
-
-// same panicking *behavior* as `panic-probe` but doesn't print a panic message
-// this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-//#[cfg(test)]
-#[defmt::panic_handler]
-fn panic() -> ! {
-    cortex_m::asm::udf()
-}
 
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
 // once within a crate. the module can be in any file but there can only be at most
 // one `#[tests]` module in this library crate
-#[defmt_test::tests]
+#[arch_dependent::tests]
 mod unit_tests {
     use super::display_mock::DisplayMock;
 

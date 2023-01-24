@@ -29,9 +29,9 @@ impl WriteOnlyDataCommand for DisplayMockExpectation<'_> {
         let expected = self.cmd.take().expect("No command sending was expected!");
 
         if let U8(actual) = data {
-            defmt::assert_eq!(actual, expected, "Unexpected command data received!");
+            assert_eq!(actual, expected, "Unexpected command data received!");
         } else {
-            defmt::panic!("Only U8 data supported for now!")
+            panic!("Only U8 data supported for now!")
         }
         Ok(())
     }
@@ -39,9 +39,9 @@ impl WriteOnlyDataCommand for DisplayMockExpectation<'_> {
         let expected = self.data.take().expect("No command sending was expected!");
 
         if let U8(actual) = data {
-            defmt::assert_eq!(actual, expected, "Unexpected command data received!");
+            assert_eq!(actual, expected, "Unexpected command data received!");
         } else {
-            defmt::panic!("Only U8 data supported for now!")
+            panic!("Only U8 data supported for now!")
         }
         Ok(())
     }
@@ -50,10 +50,10 @@ impl WriteOnlyDataCommand for DisplayMockExpectation<'_> {
 impl Drop for DisplayMockExpectation<'_> {
     fn drop(&mut self) {
         if let Some(data) = self.cmd.take() {
-            defmt::panic!("Command was expected, but not provided: {:?}", data);
+            panic!("Command was expected, but not provided: {:?}", data);
         }
         if let Some(data) = self.data.take() {
-            defmt::panic!("Data was expected, but not provided: {:?}", data);
+            panic!("Data was expected, but not provided: {:?}", data);
         }
     }
 }
