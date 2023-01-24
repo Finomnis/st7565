@@ -7,6 +7,7 @@ pub(crate) struct BufferPage<const WIDTH: usize> {
 /// A graphics page buffer, required for graphics mode.
 ///
 /// Needs to be provided by the user.
+#[derive(Clone)]
 pub struct GraphicsPageBuffer<const WIDTH: usize, const PAGES: usize> {
     pub(crate) pages: [BufferPage<WIDTH>; PAGES],
 }
