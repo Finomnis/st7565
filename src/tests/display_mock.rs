@@ -36,7 +36,7 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
         let actual = if let U8(actual) = data {
             Command(actual)
         } else {
-            defmt::panic!("Only U8 data supported for now!")
+            panic!("Only U8 data supported for now!")
         };
 
         let (expected, leftover) = self
@@ -46,7 +46,7 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
 
         self.expected_actions = leftover;
 
-        defmt::assert_eq!(&actual, expected, "Unexpected action received!");
+        assert_eq!(&actual, expected, "Unexpected action received!");
 
         Ok(())
     }
@@ -54,7 +54,7 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
         let actual = if let U8(actual) = data {
             Data(actual)
         } else {
-            defmt::panic!("Only U8 data supported for now!")
+            panic!("Only U8 data supported for now!")
         };
 
         let (expected, leftover) = self
@@ -64,7 +64,7 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
 
         self.expected_actions = leftover;
 
-        defmt::assert_eq!(&actual, expected, "Unexpected data received!");
+        assert_eq!(&actual, expected, "Unexpected data received!");
 
         Ok(())
     }
@@ -73,7 +73,7 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
 impl Drop for DisplayMock<'_, '_> {
     fn drop(&mut self) {
         if !self.expected_actions.is_empty() {
-            defmt::panic!(
+            panic!(
                 "Actions were expected, but did not happen: {:?}",
                 self.expected_actions
             );
