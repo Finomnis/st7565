@@ -270,7 +270,22 @@ mod unit_tests {
             .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
             .draw(&mut disp)
             .unwrap();
-        DisplayMock::with_expect(&[], |disp_mock| {
+
+        let expected = [
+            Command(&[0b10110001]),
+            Command(&[0b00010000, 0b00000101]),
+            Data(&[
+                0b11100000, 0b11111000, 0b00011100, 0b00001100, 0b00000110, 0b00000110, 0b00000110,
+                0b00000110, 0b00001100, 0b00011100, 0b11111000, 0b11100000,
+            ]),
+            Command(&[0b10110010]),
+            Command(&[0b00010000, 0b00000101]),
+            Data(&[
+                0b00000001, 0b00000111, 0b00001110, 0b00001100, 0b00011000, 0b00011000, 0b00011000,
+                0b00011000, 0b00001100, 0b00001110, 0b00000111, 0b00000001,
+            ]),
+        ];
+        DisplayMock::with_expect(&expected, |disp_mock| {
             let mut disp = disp.attach_display_interface(disp_mock);
             disp.flush().unwrap();
         });
