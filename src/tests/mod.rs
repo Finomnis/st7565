@@ -200,9 +200,22 @@ mod unit_tests {
         };
 
         let empty_line = [0u8; 132];
-        let empty_image = [Data(empty_line.as_slice()); 4];
+        let expected = [
+            Command(&[0b10110000]),
+            Command(&[0b00010000, 0b00000000]),
+            Data(empty_line.as_slice()),
+            Command(&[0b10110001]),
+            Command(&[0b00010000, 0b00000000]),
+            Data(empty_line.as_slice()),
+            Command(&[0b10110010]),
+            Command(&[0b00010000, 0b00000000]),
+            Data(empty_line.as_slice()),
+            Command(&[0b10110011]),
+            Command(&[0b00010000, 0b00000000]),
+            Data(empty_line.as_slice()),
+        ];
         let mut buffer = GraphicsPageBuffer::new();
-        let mut disp = DisplayMock::with_expect(&empty_image, |disp_mock| {
+        let mut disp = DisplayMock::with_expect(&expected, |disp_mock| {
             let mut disp = ST7565::new(disp_mock, DOGM132W5).into_graphics_mode(&mut buffer);
 
             // Full flush
@@ -212,10 +225,41 @@ mod unit_tests {
 
         // Draw rectangle
         Rectangle::new(Point::new(106, 6), Size::new(20, 20))
-            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 2))
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 1))
             .draw(&mut disp)
             .unwrap();
-        let mut disp = DisplayMock::with_expect(&[], |disp_mock| {
+
+        let expected = [
+            Command(&[0b10110000]),
+            Command(&[0b00010110, 0b00001010]),
+            Data(&[
+                0b11000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000,
+                0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000,
+                0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b11000000,
+            ]),
+            Command(&[0b10110001]),
+            Command(&[0b00010110, 0b00001010]),
+            Data(&[
+                0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+                0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+                0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b11111111,
+            ]),
+            Command(&[0b10110010]),
+            Command(&[0b00010110, 0b00001010]),
+            Data(&[
+                0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+                0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+                0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b11111111,
+            ]),
+            Command(&[0b10110011]),
+            Command(&[0b00010110, 0b00001010]),
+            Data(&[
+                0b00000011, 0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010,
+                0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010,
+                0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000010, 0b00000011,
+            ]),
+        ];
+        let mut disp = DisplayMock::with_expect(&expected, |disp_mock| {
             let mut disp = disp.attach_display_interface(disp_mock);
             disp.flush().unwrap();
             disp.release_display_interface().0

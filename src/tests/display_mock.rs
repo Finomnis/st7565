@@ -51,7 +51,7 @@ impl WriteOnlyDataCommand for &mut DisplayMock<'_, '_> {
 
         self.expected_actions = leftover;
 
-        assert_eq!(&actual, expected, "Unexpected action received!");
+        assert_eq!(expected, &actual, "Unexpected action received!");
 
         Ok(())
     }
@@ -69,7 +69,7 @@ impl WriteOnlyDataCommand for &mut DisplayMock<'_, '_> {
 
         self.expected_actions = leftover;
 
-        assert_eq!(&actual, expected, "Unexpected data received!");
+        assert_eq!(expected, &actual, "Unexpected data received!");
 
         Ok(())
     }
