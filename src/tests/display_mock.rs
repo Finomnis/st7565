@@ -1,6 +1,7 @@
 use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, defmt::Format)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[cfg_attr(all(target_arch = "arm", target_os = "none"), derive(defmt::Format))]
 pub enum ExpectedAction<'a> {
     Command(&'a [u8]),
     Data(&'a [u8]),
@@ -17,7 +18,7 @@ impl DisplayMock<'_, '_> {
             expected_actions: &[],
         }
     }
-    pub fn expect<'a, 'b>(mut self, expected: &'a [ExpectedAction<'b>]) -> DisplayMock<'a, 'b> {
+    pub fn expect<'a, 'b>(self, expected: &'a [ExpectedAction<'b>]) -> DisplayMock<'a, 'b> {
         assert!(
             self.expected_actions.is_empty(),
             "Previous expected actions did not happen yet!"

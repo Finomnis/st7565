@@ -50,6 +50,26 @@ jobs:
       - name: Build
         run: cargo build --all-features --examples --release
 
+  build_tests:
+    name: Build on-target tests
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabihf
+
+      - name: Disable test harness
+        run: sed -i '/#harness = false/c\harness = false' Cargo.toml
+
+      - name: Build
+        run: cargo build --all-features --all-targets --release
+
   tests:
     name: Run tests (x86_64)
     runs-on: ubuntu-latest
