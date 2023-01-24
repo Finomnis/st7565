@@ -85,11 +85,12 @@
 //! If you created a specification for a new display, please open a pull request on <https://github.com/Finomnis/st7565/pulls> to make it available to the public.
 //!
 
-#![no_main]
 #![no_std]
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]
 #![doc(issue_tracker_base_url = "https://github.com/Finomnis/st7565/issues")]
+// Building tests on target with defmt_tests requires `no_main`
+#![cfg_attr(all(target_arch = "arm", target_os = "none"), no_main)]
 
 #[cfg(test)]
 mod tests;
