@@ -19,10 +19,10 @@ exclude = [
 ]
 
 [lib]
-# Enable this to make the on-target tests compile.
-# This breaks the x86-64 tests.
+# Disable this to make the x86-64 tests compile.
+# This breaks the on-target tests.
 # Sadly, this is not configurable via `cfg()` yet.
-#harness = false
+harness = false
 
 [dependencies]
 display-interface = "0.4.1"
