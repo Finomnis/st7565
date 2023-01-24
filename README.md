@@ -39,7 +39,8 @@ let disp_spi = SPIInterface::new(
 );
 
 // Create DOGM132W-5 display driver
-let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode();
+let mut page_buffer = GraphicsPageBuffer::new();
+let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode(&mut page_buffer);
 disp.reset(&mut disp_rst, &mut timer).unwrap();
 disp.flush().unwrap();
 disp.set_display_on(true).unwrap();
