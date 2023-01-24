@@ -13,23 +13,27 @@ pub struct DisplayMock<'a, 'b> {
 }
 
 impl DisplayMock<'_, '_> {
-    pub fn new() -> Self {
-        Self {
-            expected_actions: &[],
-        }
-    }
-    pub fn expect<'a, 'b>(self, expected: &'a [ExpectedAction<'b>]) -> DisplayMock<'a, 'b> {
-        assert!(
-            self.expected_actions.is_empty(),
-            "Previous expected actions did not happen yet!"
-        );
-        DisplayMock {
+    pub fn with_expect<'a, 'b, T>(
+        expected: &'a [ExpectedAction<'b>],
+        f: impl FnOnce(&mut DisplayMock<'a, 'b>) -> T,
+    ) -> T {
+        let mut mock = DisplayMock {
             expected_actions: expected,
-        }
+        };
+
+        let result = f(&mut mock);
+
+        assert!(
+            mock.expected_actions.is_empty(),
+            "Actions were expected, but did not happen: {:?}",
+            mock.expected_actions
+        );
+
+        result
     }
 }
 
-impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
+impl WriteOnlyDataCommand for &mut DisplayMock<'_, '_> {
     fn send_commands(
         &mut self,
         data: display_interface::DataFormat<'_>,
@@ -68,16 +72,5 @@ impl WriteOnlyDataCommand for DisplayMock<'_, '_> {
         assert_eq!(&actual, expected, "Unexpected data received!");
 
         Ok(())
-    }
-}
-
-impl Drop for DisplayMock<'_, '_> {
-    fn drop(&mut self) {
-        if !self.expected_actions.is_empty() {
-            panic!(
-                "Actions were expected, but did not happen: {:?}",
-                self.expected_actions
-            );
-        }
     }
 }

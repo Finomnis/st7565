@@ -55,6 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: "-D warnings"
+      RUST_BACKTRACE: 1
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
