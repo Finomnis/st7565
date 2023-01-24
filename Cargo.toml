@@ -19,7 +19,7 @@ exclude = [
 ]
 
 [lib]
-# Disable this to make the x86-64 tests compile.
+# Disable this to make the x86_64 tests compile.
 # This breaks the on-target tests.
 # Sadly, this is not configurable via `cfg()` yet.
 harness = false
