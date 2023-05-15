@@ -30,7 +30,7 @@ embedded-hal = "0.2.7"
 embedded-graphics-core = "0.3.3"
 
 [dev-dependencies]
-embedded-graphics = "0.7.1"
+embedded-graphics = "0.8.0"
 noop-attr = "0.1.0"
 
 [target.'cfg(all(target_arch = "arm", target_os = "none"))'.dev-dependencies]
