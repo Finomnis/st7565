@@ -6,7 +6,7 @@ version = "0.1.6"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/Finomnis/st7565"
-description = "Driver for st7565 based displays."
+description = "Driver for ST7565 based displays."
 keywords = ["no-std", "st7565", "lcd", "embedded", "embedded-hal-driver"]
 categories = ["embedded", "no-std"]
 
@@ -27,10 +27,10 @@ harness = false
 [dependencies]
 display-interface = "0.4.1"
 embedded-hal = "0.2.7"
-embedded-graphics-core = "0.3.3"
+embedded-graphics-core = "0.4.0"
 
 [dev-dependencies]
-embedded-graphics = "0.7.1"
+embedded-graphics = "0.8.0"
 noop-attr = "0.1.0"
 
 [target.'cfg(all(target_arch = "arm", target_os = "none"))'.dev-dependencies]

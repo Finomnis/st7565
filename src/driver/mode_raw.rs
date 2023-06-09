@@ -8,7 +8,7 @@ pub struct RawMode;
 /// ---- Functionality of the raw mode ----
 /// =======================================
 ///
-/// This mode exists for interacting with the st7565 chip via direct low level commands.
+/// This mode exists for interacting with the ST7565 chip via direct low level commands.
 impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
     ST7565<DI, SPECS, RawMode, WIDTH, HEIGHT, PAGES>
 where
@@ -41,7 +41,7 @@ where
     /// Writes raw pixel data.
     ///
     /// For more information how data is processed by the display, read the
-    /// st7565 reference manual.
+    /// ST7565 reference manual.
     pub fn write_pixel_data(&mut self, data: &[u8]) -> Result<(), DisplayError> {
         self.interface.send_data(U8(data))
     }

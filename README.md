@@ -10,7 +10,7 @@
 
 This crate aims to provide an
 [embedded-graphics](https://crates.io/crates/embedded-graphics)
-compatible driver for displays based on the st7565 chipset.
+compatible driver for displays based on the ST7565 chipset.
 
 ## Example
 
@@ -53,7 +53,7 @@ Circle::new(Point::new(10, 6), 20)
 disp.flush().unwrap();
 ```
 
-Note the [`DOGM132W5`](displays::DOGM132W5) object. This is the display specification that contains all the display specific configuration options that need to be applied to the st7565 chip.
+Note the [`DOGM132W5`](displays::DOGM132W5) object. This is the display specification that contains all the display specific configuration options that need to be applied to the ST7565 chip.
 
 Further note the [`into_graphics_mode()`](ST7565::into_graphics_mode()) call, which switches the driver from its initial
 mode to the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) driver mode.
@@ -63,7 +63,7 @@ After drawing something, a [`flush()`](ST7565::flush()) call has to be issued to
 send the modified data to the display.
 
 
-## Adding support for new st7565 based displays
+## Adding support for new ST7565 based displays
 
 The example above uses the [`DOGM132W5`](displays::DOGM132W5) struct in the [`ST7565::new()`] call.
 

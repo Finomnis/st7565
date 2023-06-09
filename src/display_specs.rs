@@ -21,7 +21,7 @@ pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usi
 
     /// Whether the LCD bias mode needs to be "1".
     ///
-    /// For more information, read the st7565 reference manual.
+    /// For more information, read the ST7565 reference manual.
     const BIAS_MODE_1: bool;
 
     /// Which parts of the internal power circuits need to be enabled
