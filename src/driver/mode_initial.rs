@@ -10,6 +10,7 @@ pub struct InitialMode;
 
 /// ---- Functionality of the initial mode ----
 /// ===========================================
+/// This mode is purely to transition into other modes.
 impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
     ST7565<DI, SPECS, InitialMode, WIDTH, HEIGHT, PAGES>
 where
