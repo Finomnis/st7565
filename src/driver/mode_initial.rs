@@ -5,12 +5,11 @@ use display_interface::WriteOnlyDataCommand;
 use super::{mode_graphics::GraphicsMode, mode_raw::RawMode};
 use crate::{DisplaySpecs, GraphicsPageBuffer, ST7565};
 
+/// This mode is purely to transition into other modes.
 pub struct InitialMode;
 
 /// ---- Functionality of the initial mode ----
 /// ===========================================
-///
-/// This mode is purely to transition into other modes.
 impl<DI, SPECS, const WIDTH: usize, const HEIGHT: usize, const PAGES: usize>
     ST7565<DI, SPECS, InitialMode, WIDTH, HEIGHT, PAGES>
 where

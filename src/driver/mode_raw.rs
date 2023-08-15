@@ -3,6 +3,8 @@ use display_interface::{DataFormat::U8, DisplayError, WriteOnlyDataCommand};
 use crate::command::{Command, SendSt7565Command};
 use crate::ST7565;
 
+/// Raw mode provides functionality to control the ST7565 chip directly
+/// through low-level commands.
 pub struct RawMode;
 
 /// ---- Functionality of the raw mode ----

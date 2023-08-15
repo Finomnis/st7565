@@ -2,7 +2,7 @@ mod common_functionality;
 
 pub mod mode_graphics;
 pub mod mode_initial;
-mod mode_raw;
+pub mod mode_raw;
 
 mod page_buffer;
 
