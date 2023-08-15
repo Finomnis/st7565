@@ -21,6 +21,7 @@ impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
     const ELECTRONIC_VOLUME: u8 = 0b011111;
     const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
 }
+
 /// Display specification for the DOGL128-6 display
 #[allow(non_camel_case_types)]
 pub struct DOGL128_6_EXT12V;
