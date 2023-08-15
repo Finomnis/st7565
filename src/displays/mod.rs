@@ -22,6 +22,7 @@ impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
     const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
 }
 /// Display specification for the DOGL128-6 display
+#[allow(non_camel_case_types)]
 pub struct DOGL128_6_EXT12V;
 impl DisplaySpecs<128, 64, 8> for DOGL128_6_EXT12V {
     const FLIP_ROWS: bool = true;
