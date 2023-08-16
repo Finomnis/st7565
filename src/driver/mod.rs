@@ -1,8 +1,8 @@
 mod common_functionality;
 
-mod mode_graphics;
-mod mode_initial;
-mod mode_raw;
+pub mod mode_graphics;
+pub mod mode_initial;
+pub mod mode_raw;
 
 mod page_buffer;
 
