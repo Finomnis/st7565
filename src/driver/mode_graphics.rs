@@ -11,7 +11,6 @@ use crate::{
     DisplaySpecs, GraphicsPageBuffer, ST7565,
 };
 
-
 /// In this mode, the driver can be used as a [DrawTarget] for the [embedded_graphics](embedded_graphics_core) crate.
 pub struct GraphicsMode<'a, const WIDTH: usize, const PAGES: usize> {
     page_buffers: &'a mut GraphicsPageBuffer<WIDTH, PAGES>,
