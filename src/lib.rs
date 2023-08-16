@@ -18,9 +18,13 @@ pub mod displays;
 pub mod types;
 
 pub use display_specs::DisplaySpecs;
-pub use driver::mode_graphics::GraphicsMode;
-pub use driver::mode_initial::InitialMode;
-pub use driver::mode_raw::RawMode;
 pub use driver::GraphicsPageBuffer;
 pub use driver::ST7565;
 pub use error::Error;
+
+/// Operating modes of the driver
+pub mod modes {
+    pub use crate::driver::mode_graphics::GraphicsMode;
+    pub use crate::driver::mode_initial::InitialMode;
+    pub use crate::driver::mode_raw::RawMode;
+}
