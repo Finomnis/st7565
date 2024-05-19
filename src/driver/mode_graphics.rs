@@ -31,7 +31,7 @@ impl<'a, const WIDTH: usize, const PAGES: usize> GraphicsMode<'a, WIDTH, PAGES> 
 impl<
         'a,
         DI: WriteOnlyDataCommand,
-        SPECS,
+        SPECS: DisplaySpecs<WIDTH, HEIGHT, PAGES>,
         const WIDTH: usize,
         const HEIGHT: usize,
         const PAGES: usize,
@@ -49,7 +49,7 @@ impl<
                     self.interface
                         .send_command(Command::PageAddressSet { address })?;
                     self.interface.send_command(Command::ColumnAddressSet {
-                        address: start as u8,
+                        address: SPECS::COLUMN_OFFSET + start as u8,
                     })?;
                     self.interface.send_data(U8(&page.data[start..end]))?;
                 }

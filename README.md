@@ -87,6 +87,7 @@ impl DisplaySpecs<132, 32, 4> for DOGM132W5 {
     const VOLTAGE_REGULATOR_RESISTOR_RATIO: u8 = 0b011;
     const ELECTRONIC_VOLUME: u8 = 0b011111;
     const BOOSTER_RATIO: BoosterRatio = BoosterRatio::StepUp2x3x4x;
+    const COLUMN_OFFSET: u8 = 0;
 }
 ```
 
