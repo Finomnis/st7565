@@ -131,6 +131,9 @@ jobs:
   semver:
     name: Semantic Versioning
     runs-on: ubuntu-latest
+    env:
+      # No idea why this fixes the check.
+      RUSTFLAGS: "--cap-lints=warn"
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
