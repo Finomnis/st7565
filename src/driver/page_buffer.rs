@@ -32,3 +32,9 @@ impl<const WIDTH: usize, const PAGES: usize> GraphicsPageBuffer<WIDTH, PAGES> {
         }
     }
 }
+
+impl<const WIDTH: usize, const PAGES: usize> Default for GraphicsPageBuffer<WIDTH, PAGES> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
