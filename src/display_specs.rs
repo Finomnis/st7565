@@ -35,4 +35,7 @@ pub trait DisplaySpecs<const WIDTH: usize, const HEIGHT: usize, const PAGES: usi
 
     /// The internal booster ratio
     const BOOSTER_RATIO: BoosterRatio;
+
+    /// The offset of the first column on the display
+    const COLUMN_OFFSET: u8;
 }
