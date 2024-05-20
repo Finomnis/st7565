@@ -128,12 +128,21 @@ jobs:
         #run: cargo msrv --target=thumbv7em-none-eabihf --log-target=stdout
         run: cargo msrv verify --target=thumbv7em-none-eabihf --log-target=stdout
 
+  semver:
+    name: Semantic Versioning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
+
   release:
     name: Publish version
     runs-on: ubuntu-latest
     environment: production
     if: github.event_name == 'release'
-    needs: [build, build_full, tests, lints, docs, msrv]
+    needs: [build, build_full, tests, lints, docs, msrv, semver]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
