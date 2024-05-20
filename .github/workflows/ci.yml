@@ -25,7 +25,7 @@ jobs:
           - thumbv6m-none-eabi
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install cross
         uses: taiki-e/install-action@cross
@@ -40,7 +40,7 @@ jobs:
       RUSTFLAGS: "-D warnings"
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -58,7 +58,7 @@ jobs:
       RUST_BACKTRACE: 1
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -112,7 +112,7 @@ jobs:
       RUSTFLAGS: "-D warnings"
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install cargo-binstall
         uses: taiki-e/install-action@v2
@@ -128,15 +128,33 @@ jobs:
         #run: cargo msrv --target=thumbv7em-none-eabihf --log-target=stdout
         run: cargo msrv verify --target=thumbv7em-none-eabihf --log-target=stdout
 
+  semver:
+    name: Semantic Versioning
+    runs-on: ubuntu-latest
+    env:
+      # No idea why this fixes the check.
+      RUSTFLAGS: "--cap-lints=warn"
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabihf
+
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
+
   release:
     name: Publish version
     runs-on: ubuntu-latest
     environment: production
     if: github.event_name == 'release'
-    needs: [build, build_full, tests, lints, docs, msrv]
+    needs: [build, build_full, tests, lints, docs, msrv, semver]
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
