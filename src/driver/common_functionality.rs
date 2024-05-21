@@ -105,6 +105,11 @@ where
             })
             .map_err(Error::Comm)?;
 
+        // some ICs do not reset line offset to 0, so do that here as well
+        self.interface
+            .send_command(Command::DisplayStartLineSet { address: 0 })
+            .map_err(Error::Comm)?;
+
         Ok(())
     }
 }
