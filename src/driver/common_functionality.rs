@@ -26,6 +26,24 @@ where
             .send_command(Command::StaticIndicatorSet { mode })
     }
 
+    /// Sets the line offset, effectively scrolling the display through memory.
+    pub fn set_line_offset(&mut self, offset: u8) -> Result<(), DisplayError> {
+        self.interface
+            .send_command(Command::DisplayStartLineSet { address: offset })
+    }
+
+    /// Sets whether the pixels should be inverted.
+    pub fn set_inverted(&mut self, inverted: bool) -> Result<(), DisplayError> {
+        self.interface
+            .send_command(Command::DisplayNormalReverse { reverse: inverted })
+    }
+
+    /// Displays all points of the display
+    pub fn display_all_points(&mut self, enable: bool) -> Result<(), DisplayError> {
+        self.interface
+            .send_command(Command::DisplayAllPoints { on: enable })
+    }
+
     /// Enable/Disable the display output
     pub fn set_display_on(&mut self, on: bool) -> Result<(), DisplayError> {
         self.interface.send_command(Command::DisplayOnOff { on })

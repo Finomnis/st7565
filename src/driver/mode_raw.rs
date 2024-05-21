@@ -28,18 +28,6 @@ where
             .send_command(Command::ColumnAddressSet { address })
     }
 
-    /// Sets the line offset, effectively scrolling the display through memory.
-    pub fn set_line_offset(&mut self, offset: u8) -> Result<(), DisplayError> {
-        self.interface
-            .send_command(Command::DisplayStartLineSet { address: offset })
-    }
-
-    /// Sets whether the pixels should be inverted.
-    pub fn set_inverted(&mut self, inverted: bool) -> Result<(), DisplayError> {
-        self.interface
-            .send_command(Command::DisplayNormalReverse { reverse: inverted })
-    }
-
     /// Writes raw pixel data.
     ///
     /// For more information how data is processed by the display, read the
@@ -61,11 +49,5 @@ where
     pub fn common_output_mode_select(&mut self, reverse: bool) -> Result<(), DisplayError> {
         self.interface
             .send_command(Command::CommonOutputModeSelect { reverse })
-    }
-
-    /// Displays all points of the display
-    pub fn display_all_points(&mut self, enable: bool) -> Result<(), DisplayError> {
-        self.interface
-            .send_command(Command::DisplayAllPoints { on: enable })
     }
 }
