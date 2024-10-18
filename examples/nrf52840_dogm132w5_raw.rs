@@ -6,9 +6,10 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
-use embedded_hal::blocking::delay::DelayMs;
 use hal::gpio::Level;
 use st7565::{displays::DOGM132W5, ST7565};
+use embedded_hal::delay::DelayNs;
+use embedded_hal_bus::spi::ExclusiveDevice;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -41,8 +42,7 @@ fn main() -> ! {
     let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
 
     // Create DOGM132W-5 spi bus
-    let disp_spi = SPIInterface::new(
-        hal::Spim::new(
+    let spi_bus = hal::Spim::new(
             peripherals.SPIM0,
             hal::spim::Pins {
                 sck: Some(disp_scl),
@@ -52,13 +52,13 @@ fn main() -> ! {
             hal::spim::Frequency::M8,
             hal::spim::MODE_3,
             0,
-        ),
-        disp_a0,
-        disp_cs,
     );
 
+    let disp_device = ExclusiveDevice::new(spi_bus, disp_cs, hal::timer::Timer::new(peripherals.TIMER1)).unwrap();
+
+    let interface = SPIInterface::new(disp_device, disp_a0);
     // Create DOGM132W-5 display driver
-    let mut disp = ST7565::new(disp_spi, DOGM132W5).into_raw_mode();
+    let mut disp = ST7565::new(interface, DOGM132W5).into_raw_mode();
 
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
@@ -75,6 +75,6 @@ fn main() -> ! {
     loop {
         disp.set_line_offset(scroll).unwrap();
         scroll = (scroll + 1) % 32;
-        timer.delay_ms(100u8);
+        timer.delay_ms(100);
     }
 }

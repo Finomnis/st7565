@@ -1,5 +1,5 @@
 use display_interface::{DisplayError, WriteOnlyDataCommand};
-use embedded_hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
+use embedded_hal::{digital::OutputPin, delay::DelayNs};
 
 use crate::{
     command::{Command, SendSt7565Command},
@@ -57,7 +57,7 @@ where
     ) -> Result<(), Error<PinE>>
     where
         RST: OutputPin<Error = PinE>,
-        DELAY: DelayMs<u8>,
+        DELAY: DelayNs,
     {
         // Reset display
         rst.set_low().map_err(Error::Pin)?;
