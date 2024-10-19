@@ -54,7 +54,7 @@ fn main() -> ! {
             0,
     );
 
-    let disp_device = ExclusiveDevice::new(spi_bus, disp_cs, hal::timer::Timer::new(peripherals.TIMER1)).unwrap();
+    let disp_device = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
 
     let interface = SPIInterface::new(disp_device, disp_a0);
     // Create DOGM132W-5 display driver
