@@ -14,12 +14,9 @@ use embedded_graphics::{
     primitives::{Circle, PrimitiveStyle, Rectangle},
     text::Text,
 };
+use embedded_hal_bus::spi::ExclusiveDevice;
 use hal::gpio::Level;
 use st7565::{displays::DOGM132W5, GraphicsPageBuffer, ST7565};
-// For a single device on the bus
-use embedded_hal_bus::spi::ExclusiveDevice;
-// For a shared spi bus
-//use embedded_hal_bus::{spi::AtomicDevice, util::AtomicCell};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -66,10 +63,6 @@ fn main() -> ! {
 
     // Create an ExclusiveDevice, the bus will be owned only by the device
     let disp_device = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
-
-    // if you need to share the spi bus, create a shared bus and a shared device (AtomicDevice)
-    // let atomic_spi_bus = AtomicCell::new(spi_bus);
-    // let disp_device = AtomicDevice::new(&atomic_spi_bus, disp_cs, hal::timer::Timer::new(peripherals.TIMER1)).unwrap();
 
     let interface = SPIInterface::new(disp_device, disp_a0);
     // Create DOGM132W-5 display driver
