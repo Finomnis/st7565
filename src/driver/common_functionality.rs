@@ -1,5 +1,5 @@
 use display_interface::{DisplayError, WriteOnlyDataCommand};
-use embedded_hal::{digital::OutputPin, delay::DelayNs};
+use embedded_hal::{delay::DelayNs, digital::OutputPin};
 
 use crate::{
     command::{Command, SendSt7565Command},

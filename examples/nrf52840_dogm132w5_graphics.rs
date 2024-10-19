@@ -53,15 +53,15 @@ fn main() -> ! {
 
     // Create DOGM132W-5 spi bus
     let spi_bus = hal::Spim::new(
-            peripherals.SPIM0,
-            hal::spim::Pins {
-                sck: Some(disp_scl),
-                mosi: Some(disp_si),
-                miso: None,
-            },
-            hal::spim::Frequency::M8,
-            hal::spim::MODE_3,
-            0,
+        peripherals.SPIM0,
+        hal::spim::Pins {
+            sck: Some(disp_scl),
+            mosi: Some(disp_si),
+            miso: None,
+        },
+        hal::spim::Frequency::M8,
+        hal::spim::MODE_3,
+        0,
     );
 
     // Create an ExclusiveDevice, the bus will be owned only by the device
@@ -70,7 +70,7 @@ fn main() -> ! {
     // if you need to share the spi bus, create a shared bus and a shared device (AtomicDevice)
     // let atomic_spi_bus = AtomicCell::new(spi_bus);
     // let disp_device = AtomicDevice::new(&atomic_spi_bus, disp_cs, hal::timer::Timer::new(peripherals.TIMER1)).unwrap();
-    
+
     let interface = SPIInterface::new(disp_device, disp_a0);
     // Create DOGM132W-5 display driver
     let mut page_buffer = GraphicsPageBuffer::new();

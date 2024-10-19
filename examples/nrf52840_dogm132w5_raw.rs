@@ -6,10 +6,10 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
-use hal::gpio::Level;
-use st7565::{displays::DOGM132W5, ST7565};
 use embedded_hal::delay::DelayNs;
 use embedded_hal_bus::spi::ExclusiveDevice;
+use hal::gpio::Level;
+use st7565::{displays::DOGM132W5, ST7565};
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
@@ -43,15 +43,15 @@ fn main() -> ! {
 
     // Create DOGM132W-5 spi bus
     let spi_bus = hal::Spim::new(
-            peripherals.SPIM0,
-            hal::spim::Pins {
-                sck: Some(disp_scl),
-                mosi: Some(disp_si),
-                miso: None,
-            },
-            hal::spim::Frequency::M8,
-            hal::spim::MODE_3,
-            0,
+        peripherals.SPIM0,
+        hal::spim::Pins {
+            sck: Some(disp_scl),
+            mosi: Some(disp_si),
+            miso: None,
+        },
+        hal::spim::Frequency::M8,
+        hal::spim::MODE_3,
+        0,
     );
 
     let disp_device = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
