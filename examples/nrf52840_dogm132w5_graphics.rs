@@ -60,14 +60,12 @@ fn main() -> ! {
         hal::spim::MODE_3,
         0,
     );
+    let disp_spidevice = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
+    let disp_interface = SPIInterface::new(disp_spidevice, disp_a0);
 
-    // Create an ExclusiveDevice, the bus will be owned only by the device
-    let disp_device = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
-
-    let interface = SPIInterface::new(disp_device, disp_a0);
     // Create DOGM132W-5 display driver
     let mut page_buffer = GraphicsPageBuffer::new();
-    let mut disp = ST7565::new(interface, DOGM132W5).into_graphics_mode(&mut page_buffer);
+    let mut disp = ST7565::new(disp_interface, DOGM132W5).into_graphics_mode(&mut page_buffer);
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.flush().unwrap();
     disp.set_display_on(true).unwrap();
