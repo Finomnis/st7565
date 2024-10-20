@@ -6,7 +6,8 @@ use nrf52840_hal as hal; // memory layout
 use panic_probe as _;
 
 use display_interface_spi::SPIInterface;
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::delay::DelayNs;
+use embedded_hal_bus::spi::ExclusiveDevice;
 use hal::gpio::Level;
 use st7565::{displays::DOGM132W5, ST7565};
 
@@ -41,25 +42,22 @@ fn main() -> ! {
     let disp_si = port0.p0_19.into_push_pull_output(Level::Low).degrade();
 
     // Create DOGM132W-5 spi bus
-    let disp_spi = SPIInterface::new(
-        hal::Spim::new(
-            peripherals.SPIM0,
-            hal::spim::Pins {
-                sck: Some(disp_scl),
-                mosi: Some(disp_si),
-                miso: None,
-            },
-            hal::spim::Frequency::M8,
-            hal::spim::MODE_3,
-            0,
-        ),
-        disp_a0,
-        disp_cs,
+    let spi_bus = hal::Spim::new(
+        peripherals.SPIM0,
+        hal::spim::Pins {
+            sck: Some(disp_scl),
+            mosi: Some(disp_si),
+            miso: None,
+        },
+        hal::spim::Frequency::M8,
+        hal::spim::MODE_3,
+        0,
     );
+    let disp_spidevice = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
+    let disp_interface = SPIInterface::new(disp_spidevice, disp_a0);
 
     // Create DOGM132W-5 display driver
-    let mut disp = ST7565::new(disp_spi, DOGM132W5).into_raw_mode();
-
+    let mut disp = ST7565::new(disp_interface, DOGM132W5).into_raw_mode();
     disp.reset(&mut disp_rst, &mut timer).unwrap();
     disp.set_display_on(true).unwrap();
 
@@ -75,6 +73,6 @@ fn main() -> ! {
     loop {
         disp.set_line_offset(scroll).unwrap();
         scroll = (scroll + 1) % 32;
-        timer.delay_ms(100u8);
+        timer.delay_ms(100);
     }
 }
