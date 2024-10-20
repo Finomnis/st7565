@@ -22,25 +22,23 @@ with `CPOL=1` and `CPHA=1`, which is also called `SPI Mode 3`.
 
 ```rust
 // Create DOGM132W-5 spi bus
-let disp_spi = SPIInterface::new(
-    hal::Spim::new(
-        peripherals.SPIM0,
-        hal::spim::Pins {
-            sck: disp_scl,
-            mosi: Some(disp_si),
-            miso: None,
-        },
-        hal::spim::Frequency::M8,
-        hal::spim::MODE_3,
-        0,
-    ),
-    disp_a0,
-    disp_cs,
+let spi_bus = hal::Spim::new(
+    peripherals.SPIM0,
+    hal::spim::Pins {
+        sck: Some(disp_scl),
+        mosi: Some(disp_si),
+        miso: None,
+    },
+    hal::spim::Frequency::M8,
+    hal::spim::MODE_3,
+    0,
 );
+let disp_spidevice = ExclusiveDevice::new_no_delay(spi_bus, disp_cs).unwrap();
+let disp_interface = SPIInterface::new(disp_spidevice, disp_a0);
 
 // Create DOGM132W-5 display driver
 let mut page_buffer = GraphicsPageBuffer::new();
-let mut disp = ST7565::new(disp_spi, DOGM132W5).into_graphics_mode(&mut page_buffer);
+let mut disp = ST7565::new(disp_interface, DOGM132W5).into_graphics_mode(&mut page_buffer);
 disp.reset(&mut disp_rst, &mut timer).unwrap();
 disp.flush().unwrap();
 disp.set_display_on(true).unwrap();
